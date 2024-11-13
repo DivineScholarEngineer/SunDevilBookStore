@@ -90,13 +90,13 @@ This is a CSE360 project of use making a bookstore for ASU where we have 3 secti
 - In the "Goals" field, enter `javafx:run` to build your project.
 - Click `Run`. Maven will compile and package your project, downloading any missing dependencies.
 
-5. **Run Specific Maven Goals
+5. Run Specific Maven Goals
 - To run specific goals, like `mvn clean`, `mvn compile`, etc., right-click on your project, choose `Run As`, then select the Maven command.
 - For example:
 - `clean`: Deletes the `target` directory.
 - `compile`: Compiles the source code.
 - `test`: Runs the tests.
 
-6. **Check Maven Repositories and Dependencies**
+6. Check Maven Repositories and Dependencies
 - Open the `pom.xml` file and go to the `Dependencies` tab (available in Eclipse's Maven editor view).
 - Here, you can manage dependencies, repositories, and plugins for your project
