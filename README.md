@@ -9,7 +9,7 @@ This is a CSE360 project of use making a bookstore for ASU where we have 3 secti
 - Restart Eclipse after installation.
 2. Import the Maven Project:
    - Clone the repository from GitHub using the repository URL.
-     - Open Eclipse, go to File > Import > Git > Projects from Git > Clone URI.
+     - Open Eclipse, go to 'File' > 'Import' > 'Git' > 'Projects from Git' > 'Clone URI'.
      - Paste the repository URL and follow the prompts to clone the project.
    - Once cloned, go to File > Import > Maven > Existing Maven Projects.
    - Select the cloned repository folder and import it into Eclipse.
