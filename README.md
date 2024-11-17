@@ -7,18 +7,17 @@ This is a CSE360 project of use making a bookstore for ASU where we have 3 secti
 - Go to `Help` > `Eclipse Marketplace`.
 - In the search box, type "Maven" and install the "Maven Integration for Eclipse" plugin.
 - Restart Eclipse after installation.
-
-2. Create a Maven Project
-- Go to `File` > `New` > `Project`.
-- In the wizard, select `Maven Project` under the `Maven` folder, then click `Next`.
-- Choose `Create a simple project (skip archetype selection)` if you want a basic setup, then click `Next`.
-- Enter the `Group Id` and `Artifact Id` (basic identifiers for your project).
-- Click `Finish` to create the project.
-
-3. Add javafx to Maven Dependencies if not included
-- Open the `pom.xml` file in your project (found in the root of your Maven project).
-- In the `<dependencies>` section, add any dependencies you need:
-- <dependencies>
+2. Import the Maven Project:
+   - Clone the repository from GitHub using the repository URL.
+     - Open Eclipse, go to File > Import > Git > Projects from Git > Clone URI.
+     - Paste the repository URL and follow the prompts to clone the project.
+   - Once cloned, go to File > Import > Maven > Existing Maven Projects.
+   - Select the cloned repository folder and import it into Eclipse.
+3. Manage Dependencies in pom.xml:
+- If additional dependencies are needed:
+- Open the pom.xml file located in the root of the project.
+- Check for existing dependencies and add any additional ones required for the project, such as logging frameworks, database connectors, or JavaFX dependencies.
+  - <dependencies>
         <!-- JavaFX Dependencies -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -82,21 +81,24 @@ This is a CSE360 project of use making a bookstore for ASU where we have 3 secti
         <!-- Additional Dependencies if needed -->
         <!-- Add any additional libraries or dependencies here -->
     </dependencies>
-- Save the `pom.xml` file, and Maven will download the specified dependencies.
-
-4. Build and Run Maven Project
+- Save the pom.xml file, and Maven will automatically download the specified dependencies.
+4. Update Database Credentials:
+- If the project connects to a database, ensure the configuration file is updated with the correct database credentials.
+- These credentials can be found in MySQL Workbench or your database management system.
+5. Run the Project:
+  - Open the project in Eclipse and navigate to SplashScreen.java, the main entry point for the application.
+  - Right-click the project in the Project Explorer and select Run As > Maven build....
+  - In the "Goals" field, enter javafx:run and click Run to execute the application.
+6. Update Database Credentials:
+- If the project connects to a database, ensure the configuration file is updated with the correct database credentials.
+- These credentials can be found in MySQL Workbench or your database management system.
+7. Build and Run Maven Project
 - Right-click on your Maven project in the Project Explorer.
 - Go to `Run As` > `Maven build...`.
 - In the "Goals" field, enter `javafx:run` to build your project.
 - Click `Run`. Maven will compile and package your project, downloading any missing dependencies.
+- Examples of common goals:
+  - clean: Deletes the target directory.
+  - compile: Compiles the source code.
+  - test: Runs tests for the project.
 
-5. Run Specific Maven Goals
-- To run specific goals, like `mvn clean`, `mvn compile`, etc., right-click on your project, choose `Run As`, then select the Maven command.
-- For example:
-- `clean`: Deletes the `target` directory.
-- `compile`: Compiles the source code.
-- `test`: Runs the tests.
-
-6. Check Maven Repositories and Dependencies
-- Open the `pom.xml` file and go to the `Dependencies` tab (available in Eclipse's Maven editor view).
-- Here, you can manage dependencies, repositories, and plugins for your project
