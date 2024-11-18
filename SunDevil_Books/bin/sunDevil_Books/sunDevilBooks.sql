@@ -4,13 +4,17 @@ CREATE DATABASE IF NOT EXISTS sunDevilBooks
 
 USE sunDevilBooks;
 
-CREATE TABLE IF NOT EXISTS users (
-    user_id VARCHAR(50) PRIMARY KEY,
-    username VARCHAR(100) NOT NULL,  -- Added Username column
-    role ENUM('Buyer', 'Seller', 'Admin') NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+CREATE TABLE users (
+    user_id VARCHAR(50) PRIMARY KEY, -- Unique user ID, e.g., JOHDOE1234
+    first_name VARCHAR(50) NOT NULL, -- First name of the user
+    last_name VARCHAR(50) NOT NULL,  -- Last name of the user
+    username VARCHAR(50) NOT NULL UNIQUE, -- Username must be unique
+    password VARCHAR(50) NOT NULL, -- Password for the user
+    role ENUM('Admin', 'Buyer', 'Seller') DEFAULT 'Buyer' NOT NULL, -- Role of the user, default to 'Buyer'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Created at timestamp
+);
+DROP TABLE IF EXISTS users; 
+SET FOREIGN_KEY_CHECKS = 0;
 
 
 CREATE TABLE IF NOT EXISTS books (
