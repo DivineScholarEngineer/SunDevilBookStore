@@ -34,6 +34,8 @@ CREATE TABLE users (
     role ENUM('Admin', 'Buyer', 'Seller') DEFAULT 'Buyer' NOT NULL, -- Role of the user, default to 'Buyer'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Created at timestamp
 );
+DROP TABLE IF EXISTS users; 
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- Create books table
 DROP TABLE IF EXISTS books;
