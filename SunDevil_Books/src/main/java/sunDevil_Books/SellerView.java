@@ -1,4 +1,4 @@
-package application;
+package sunDevil_Books;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -13,9 +13,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class SellerView extends Application {
-	
-	
-	
 		private String bookName;
 		private String originalPrice;
 		private String authorName;
@@ -25,8 +22,7 @@ public class SellerView extends Application {
 		private String sellingPrice;
 		private static String userName;
 		private boolean isSellingPrice;
-		
-		
+				
 		public void start(Stage primaryStage)
 		{
 			
@@ -124,21 +120,6 @@ public class SellerView extends Application {
 			gridPane.setPadding(new Insets(10, 10, 10, 10));
 			gridPane.setHgap(10); 
 	        gridPane.setVgap(20);
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
 	        
 			Scene scene = new Scene(gridPane, 400, 400);
 	        primaryStage.setScene(scene);

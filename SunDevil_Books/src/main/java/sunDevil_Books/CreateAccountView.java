@@ -51,6 +51,10 @@ public class CreateAccountView extends Application {
 
         // Layout for the create account screen
         VBox layout = new VBox(10, firstNameField, lastNameField, usernameField, passwordField, createAccountButton, backButton, accountStatusLabel);
+        layout.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #FFC627; " +
+                "-fx-border-width: 3px; " +
+                "-fx-border-style: solid; ");
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
 

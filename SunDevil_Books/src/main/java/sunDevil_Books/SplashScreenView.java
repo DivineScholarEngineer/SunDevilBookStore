@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class SplashScreenView extends Application {
 
@@ -15,9 +17,14 @@ public class SplashScreenView extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("SunDevil Books");
 
-        // Application name with styling
-        Label appName = new Label("SunDevil Books");
-        appName.setStyle("-fx-font-size: 36px; -fx-font-weight: bold;");
+        ImageView logoView = new ImageView();
+        Image logo = new Image(getClass().getResourceAsStream("sundevilbooks.png"));
+            
+        logoView.setImage(logo);
+            
+        logoView.setFitWidth(400);  
+        logoView.setFitHeight(200); 
+        logoView.setPreserveRatio(true); 
 
         // Login and Create Account buttons
         Button loginButton = new Button("Login");
@@ -48,10 +55,15 @@ public class SplashScreenView extends Application {
         });
 
         // Splash screen layout with app name and buttons
-        VBox vbox = new VBox(100, appName, buttonBox);
+        VBox vbox = new VBox(10, logoView, buttonBox);
+        vbox.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #FFC627; " +
+                "-fx-border-width: 3px; " +
+                "-fx-border-style: solid; ");
+        
         vbox.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(vbox, 800, 600);
+        Scene scene = new Scene(vbox, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

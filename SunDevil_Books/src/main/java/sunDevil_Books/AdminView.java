@@ -1,4 +1,4 @@
-package sunDevil_Books; // Replace with your actual package name
+package sunDevil_Books;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -44,8 +44,7 @@ public class AdminView extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Admin Management");
 
-        // Initialize Database (Create tables if not exist)
-        initializeDatabase();
+         DatabaseOperations.initializeDatabase();
 
         // Layout for the top (logo, admin details, log out button)
         HBox topBar = createTopBar(primaryStage);
@@ -78,6 +77,10 @@ public class AdminView extends Application {
 
         // Set up the main layout
         BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #FFC627; " +
+                "-fx-border-width: 3px; " +
+                "-fx-border-style: solid; ");
         borderPane.setTop(topBar);
         borderPane.setCenter(tabPane);
         borderPane.setPadding(new Insets(20));
@@ -90,22 +93,22 @@ public class AdminView extends Application {
     // Function to create the top bar with logo, admin info, and log out button
     private HBox createTopBar(Stage stage) {
         // Logo section
-        File file = new File("C:\\Users\\divin\\eclipse-workspace\\SunDevil_Books\\src\\sunDevil_Books\\sundevilbooks.jpg");
+        File file = new File("C:\\Users\\divin\\eclipse-workspace\\SunDevil_Books\\src\\sunDevil_Books\\sundevilbooks.png");
         Image logoImage;
         if (file.exists()) {
             logoImage = new Image(file.toURI().toString());
         } else {
-            InputStream logoStream = getClass().getResourceAsStream("/sunDevil_Books/sundevilbooks.jpg");
+            InputStream logoStream = getClass().getResourceAsStream("/sunDevil_Books/sundevilbooks.png");
             if (logoStream != null) {
                 logoImage = new Image(logoStream);
             } else {
                 logoImage = null;
-                showAlert(Alert.AlertType.ERROR, "Default logo image not found.");
+                Utils.showAlert(Alert.AlertType.ERROR, "Default logo image not found.");
             }
         }
 
         logoImageView = new ImageView(logoImage);
-        logoImageView.setFitWidth(100);
+        logoImageView.setFitWidth(200);
         logoImageView.setFitHeight(100);
 
         Button uploadLogoButton = new Button("Change Logo");
@@ -209,7 +212,7 @@ public class AdminView extends Application {
 
             if (category == null || name.isEmpty() || author.isEmpty() ||
                     yearStr.isEmpty() || priceStr.isEmpty() || condition == null) {
-                showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a book.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a book.");
                 return;
             }
 
@@ -219,7 +222,7 @@ public class AdminView extends Application {
                 year = Integer.parseInt(yearStr);
                 price = Double.parseDouble(priceStr);
             } catch (NumberFormatException ex) {
-                showAlert(Alert.AlertType.ERROR, "Invalid year or price format.");
+                Utils.showAlert(Alert.AlertType.ERROR, "Invalid year or price format.");
                 return;
             }
 
@@ -298,7 +301,7 @@ public class AdminView extends Application {
             String condition = editConditionComboBox.getValue();
 
             if (bookIdStr.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please enter Book ID to edit.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter Book ID to edit.");
                 return;
             }
 
@@ -306,13 +309,13 @@ public class AdminView extends Application {
             try {
                 bookId = Integer.parseInt(bookIdStr);
             } catch (NumberFormatException ex) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
+                Utils.showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
                 return;
             }
 
             if (category == null && name.isEmpty() && author.isEmpty() &&
                     yearStr.isEmpty() && priceStr.isEmpty() && condition == null) {
-                showAlert(Alert.AlertType.WARNING, "Please fill in at least one field to update.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please fill in at least one field to update.");
                 return;
             }
 
@@ -321,7 +324,7 @@ public class AdminView extends Application {
                 try {
                     year = Integer.parseInt(yearStr);
                 } catch (NumberFormatException ex) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid year format.");
+                    Utils.showAlert(Alert.AlertType.ERROR, "Invalid year format.");
                     return;
                 }
             }
@@ -331,7 +334,7 @@ public class AdminView extends Application {
                 try {
                     price = Double.parseDouble(priceStr);
                 } catch (NumberFormatException ex) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid price format.");
+                    Utils.showAlert(Alert.AlertType.ERROR, "Invalid price format.");
                     return;
                 }
             }
@@ -379,7 +382,7 @@ public class AdminView extends Application {
         removeBookButton.setOnAction(e -> {
             String bookIdStr = removeBookIdField.getText().trim();
             if (bookIdStr.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please enter Book ID to remove.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter Book ID to remove.");
                 return;
             }
 
@@ -387,7 +390,7 @@ public class AdminView extends Application {
             try {
                 bookId = Integer.parseInt(bookIdStr);
             } catch (NumberFormatException ex) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
+                Utils.showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
                 return;
             }
 
@@ -437,7 +440,7 @@ public class AdminView extends Application {
             String password = passwordField.getText().trim();
 
             if (role == null || userId.isEmpty() || username.isEmpty() || password.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a user.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a user.");
                 return;
             }
 
@@ -494,7 +497,7 @@ public class AdminView extends Application {
             String newUsername = editUsernameField.getText().trim();
 
             if (userId.isEmpty() || (newRole == null && newUsername.isEmpty())) {
-                showAlert(Alert.AlertType.WARNING, "Please enter User ID and select a new role or username.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter User ID and select a new role or username.");
                 return;
             }
 
@@ -533,11 +536,11 @@ public class AdminView extends Application {
         removeUserButton.setOnAction(e -> {
             String userId = removeUserIdField.getText().trim();
             if (userId.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please enter User ID to remove.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter User ID to remove.");
                 return;
             }
 
-            removeUser(userId);
+            DatabaseOperations.removeUser(userId);
             removeUserIdField.clear();
         });
 
@@ -577,80 +580,7 @@ public class AdminView extends Application {
 
         return reportsBox;
     }
-
-    // Function to initialize the database (execute SQL from file)
- // Function to initialize the database (execute SQL from file)
- // Only connect to the database; don't re-run the SQL file
-    private void initializeDatabase() {
-        try {
-            // Load JDBC Driver
-            Class.forName(DatabaseConfig.JDBC_DRIVER);
-            // Connect to the database (DB_URL should point to the database directly)
-            try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD)) {
-                System.out.println("Connected to the database successfully.");
-                // You can add more logic here if needed, but avoid re-running the SQL file.
-            }
-        } catch (ClassNotFoundException e) {
-            showAlert(Alert.AlertType.ERROR, "JDBC Driver not found: " + e.getMessage());
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database connection error: " + e.getMessage());
-        }
-    }
-
-//    private void initializeDatabase() {
-//        try {
-//            // Load the JDBC driver
-//            Class.forName(DatabaseConfig.JDBC_DRIVER);
-//
-//            // Step 1: Establish connection to MySQL server without specifying database
-//            try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL_NO_DB, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-//                 Statement stmt = conn.createStatement()) {
-//
-//                // Step 2: Create the database if it does not exist
-//                String createDbQuery = "CREATE DATABASE IF NOT EXISTS sunDevilBooks";
-//                stmt.executeUpdate(createDbQuery);
-//                System.out.println("Database created or already exists.");
-//
-//                // Step 3: Use the sunDevilBooks database
-//                String useDbQuery = "USE sunDevilBooks";
-//                stmt.executeUpdate(useDbQuery);
-//                System.out.println("Switched to sunDevilBooks database.");
-//
-//                // Step 4: Verify if the SQL file path is correct and exists
-//                String sqlFilePath = "C:\\Users\\divin\\eclipse-workspace\\SunDevil_Books\\src\\main\\java\\sunDevil_Books\\sunDevilBooks.sql";
-//
-//                if (!Files.exists(Paths.get(sqlFilePath))) {
-//                    showAlert(Alert.AlertType.ERROR, "SQL file not found at the specified path: " + sqlFilePath);
-//                    return;
-//                }
-//
-//                // Step 5: Read the SQL file
-//                String sqlContent = new String(Files.readAllBytes(Paths.get(sqlFilePath)));
-//
-//                // Step 6: Split SQL statements by semicolon (ensure to handle semicolons inside strings)
-//                String[] sqlStatements = sqlContent.split("(?<=;\\s)");
-//
-//                // Step 7: Execute each SQL statement
-//                for (String statement : sqlStatements) {
-//                    statement = statement.trim();
-//                    if (!statement.isEmpty() && !statement.startsWith("--")) { // Skip empty or commented lines
-//                        stmt.execute(statement);
-//                    }
-//                }
-//
-//                System.out.println("Database initialized successfully using sunDevilBooks.sql.");
-//            }
-//        } catch (ClassNotFoundException e) {
-//            showAlert(Alert.AlertType.ERROR, "JDBC Driver not found: " + e.getMessage());
-//        } catch (SQLException e) {
-//            showAlert(Alert.AlertType.ERROR, "Database initialization error: " + e.getMessage());
-//        } catch (IOException e) {
-//            showAlert(Alert.AlertType.ERROR, "Error reading SQL file: " + e.getMessage());
-//        }
-//    }
-
-
-
+    
     // Function to add a user
     private void addUser(String role, String userId, String username, String password) {
         String query = "INSERT INTO users (user_id, username, role, password) VALUES (?, ?, ?, ?)";
@@ -663,11 +593,11 @@ public class AdminView extends Application {
             statement.setString(4, password);
             statement.executeUpdate();
 
-            showAlert(Alert.AlertType.INFORMATION, "User added successfully!");
+            Utils.showAlert(Alert.AlertType.INFORMATION, "User added successfully!");
         } catch (SQLIntegrityConstraintViolationException e) {
-            showAlert(Alert.AlertType.ERROR, "User ID already exists.");
+            Utils.showAlert(Alert.AlertType.ERROR, "User ID already exists.");
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error adding user: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error adding user: " + e.getMessage());
         }
     }
 
@@ -707,31 +637,12 @@ public class AdminView extends Application {
             int rowsUpdated = statement.executeUpdate();
 
             if (rowsUpdated > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "User updated successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "User updated successfully!");
             } else {
-                showAlert(Alert.AlertType.WARNING, "User ID not found.");
+                Utils.showAlert(Alert.AlertType.WARNING, "User ID not found.");
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error editing user: " + e.getMessage());
-        }
-    }
-
-    // Function to remove a user
-    private void removeUser(String userId) {
-        String query = "DELETE FROM users WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement statement = conn.prepareStatement(query)) {
-
-            statement.setString(1, userId);
-            int rowsDeleted = statement.executeUpdate();
-
-            if (rowsDeleted > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "User removed successfully!");
-            } else {
-                showAlert(Alert.AlertType.WARNING, "User ID not found.");
-            }
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error removing user: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error editing user: " + e.getMessage());
         }
     }
 
@@ -750,9 +661,9 @@ public class AdminView extends Application {
             statement.setString(6, condition);
             statement.executeUpdate();
 
-            showAlert(Alert.AlertType.INFORMATION, "Book added successfully!");
+            Utils.showAlert(Alert.AlertType.INFORMATION, "Book added successfully!");
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error adding book: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error adding book: " + e.getMessage());
         }
     }
 
@@ -824,12 +735,12 @@ public class AdminView extends Application {
             int rowsUpdated = statement.executeUpdate();
 
             if (rowsUpdated > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "Book updated successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "Book updated successfully!");
             } else {
-                showAlert(Alert.AlertType.WARNING, "Book ID not found.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Book ID not found.");
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error editing book: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error editing book: " + e.getMessage());
         }
     }
 
@@ -843,19 +754,19 @@ public class AdminView extends Application {
             int rowsDeleted = statement.executeUpdate();
 
             if (rowsDeleted > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "Book removed successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "Book removed successfully!");
             } else {
-                showAlert(Alert.AlertType.WARNING, "Book ID not found.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Book ID not found.");
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error removing book: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error removing book: " + e.getMessage());
         }
     }
 
     // Function to generate reports
     private void generateReport(String category) {
         if (category == null) {
-            showAlert(Alert.AlertType.WARNING, "Please select a report category.");
+            Utils.showAlert(Alert.AlertType.WARNING, "Please select a report category.");
             return;
         }
 
@@ -875,9 +786,9 @@ public class AdminView extends Application {
             // Generate report and save to the selected file
             try {
                 generateExcelReport(file, category);
-                showAlert(Alert.AlertType.INFORMATION, "Report for " + category + " generated successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "Report for " + category + " generated successfully!");
             } catch (IOException | SQLException e) {
-                showAlert(Alert.AlertType.ERROR, "Error generating report: " + e.getMessage());
+                Utils.showAlert(Alert.AlertType.ERROR, "Error generating report: " + e.getMessage());
             }
         }
     }
@@ -1106,7 +1017,7 @@ public class AdminView extends Application {
                 transactionsList.getItems().add(transaction);
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error fetching transactions: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error fetching transactions: " + e.getMessage());
         }
     }
 
@@ -1124,19 +1035,11 @@ public class AdminView extends Application {
                 bookIdsList.getItems().add("Book ID: " + bookId);
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error fetching book IDs: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error fetching book IDs: " + e.getMessage());
         }
     }
 
-    // Utility function to show alerts
-    private void showAlert(Alert.AlertType type, String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(type, message, ButtonType.OK);
-            alert.showAndWait();
-        });
+    public static void main(String[] args) {
+        launch(args);
     }
-
-//    public static void main(String[] args) {
-//        launch(args);
-//    }
 }
