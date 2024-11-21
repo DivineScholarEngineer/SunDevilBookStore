@@ -4,17 +4,21 @@ package sunDevil_Books;
 import java.util.Random;
 import java.util.regex.Pattern;
 
+
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.layout.GridPane;
+
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+
 import java.sql.*;
 
 public class SellerView extends Application {
@@ -34,9 +38,25 @@ public class SellerView extends Application {
 		
 		public void start(Stage primaryStage)
 		{
-			
-			Label title1Label = new Label("Book Information");
-			Label title2Label = new Label("Selling Information");
+			primaryStage.setTitle("Seller View");
+			BorderPane mainLayout = new BorderPane();
+			GridPane gridPane = new GridPane();
+			GridPane box1 = new GridPane();
+			GridPane box3 = new GridPane();
+			GridPane userBox = new GridPane();
+			ImageView logoView = new ImageView();
+	        /*Image logo = new Image(getClass().getResourceAsStream("sundevilbooks.png"));
+	        logoView.setImage(logo);
+	        logoView.setFitWidth(200);  
+	        logoView.setFitHeight(100); 
+	        logoView.setPreserveRatio(true);*/ 
+	        
+	        mainLayout.setStyle("-fx-background-color: white; -fx-border-color: #FFC627; -fx-border-width: 3px; -fx-border-style: solid;");
+	        mainLayout.setPadding(new Insets(50,20,50,150));
+	        
+	        
+			Label title1Label = Utils.createStyledLabel("Book Information");
+			Label title2Label = Utils.createStyledLabel("Selling Information");
 			Label bookNameLabel = new Label("Book Name: ");
 			Label originialPriceLabel = new Label("Originial Price: ");
 			Label authorNameLabel = new Label("Author: ");
@@ -45,7 +65,8 @@ public class SellerView extends Application {
 			Label bookConditionLabel= new Label("Book Condition: ");
 			Label sellingPriceLabel= new Label("Selling Price: ");
 			
-			
+			Label userLabel = new Label("User : " + userName);
+			Label roleLabel = new Label("Role: Seller");
 			
 			TextField bookNameField = new TextField(); 
 			TextField originalPriceField = new TextField(); 
@@ -53,22 +74,30 @@ public class SellerView extends Application {
 			TextField publishedYearField = new TextField(); 
 			TextField sellingPriceField = new TextField(); 
 			
-			Button listBookButton = new Button("List My Book");
-			Button calculateSellingPriceButton = new Button("Calculate Selling Price");
+			Button listBookButton = Utils.createStyledButton("List My Book");
+			Button calculateSellingPriceButton = Utils.createStyledButton("Calculate Selling Price");
+			Button logoutButton = Utils.createStyledButton("Log Out");
 			ComboBox<String> bookCategoryCombo = new ComboBox<>();
 			ComboBox<String> bookConditionCombo = new ComboBox<>();
 			
+			
 			bookCategoryCombo.getItems().addAll("Natural Science", "Computer", "Math", "English Language", "Other");
 			bookConditionCombo.getItems().addAll("Like New", "Used", "Moderately Used", "Heavily Used");
-			GridPane gridPane = new GridPane();
+			
+			
+			
+			
+			
+			
 			isSellingPrice = false;
 			bookCategoryCombo.setOnAction(event -> {
+				
 	            bookCategory = bookCategoryCombo.getValue();
-	            System.out.println("Selected: " + bookCategory);
+	            //System.out.println("Selected: " + bookCategory);
 			});
 			bookConditionCombo.setOnAction(event -> {
 	            bookCondition = bookConditionCombo.getValue();
-	            System.out.println("Selected: " + bookCondition);
+	            //System.out.println("Selected: " + bookCondition);
 			});
 			calculateSellingPriceButton.setOnAction(e -> {
 				bookName = bookNameField.getText();
@@ -148,31 +177,66 @@ public class SellerView extends Application {
 				
 				
 			});
-			gridPane.add(title1Label, 1, 0);
-			gridPane.add(title2Label, 1, 5);
-			gridPane.add(bookNameLabel, 0, 1);
-			gridPane.add(originialPriceLabel, 0, 2);
-			gridPane.add(authorNameLabel, 0, 3);
-			gridPane.add(publishedYearLabel, 0, 4);
-			gridPane.add(bookCategoryLabel, 0, 6);
-			gridPane.add(bookConditionLabel, 0, 7);
-			gridPane.add(sellingPriceLabel, 3, 3);
+			logoutButton.setOnAction(e -> {
+				Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
+	            alert.showAndWait();
+
+	            SplashScreenView splashScreenView = new SplashScreenView();
+	            splashScreenView.start(primaryStage); // Go back to splash screen
+				
+			});
+			box1.add(title1Label, 1, 0);
+			box1.add(bookNameLabel, 0, 1);
+			box1.add(originialPriceLabel, 0, 2);
+			box1.add(authorNameLabel, 0, 3);
+			box1.add(publishedYearLabel, 0, 4);
+			box1.add(bookNameField, 1, 1);
+			box1.add(originalPriceField, 1, 2);
+			box1.add(authorNameField, 1, 3);
+			box1.add(publishedYearField, 1, 4);
 			
+			gridPane.add(title2Label, 1, 0);
+			gridPane.add(bookCategoryLabel, 0, 1);
+			gridPane.add(bookConditionLabel, 0, 2);
+			gridPane.add(bookCategoryCombo, 1, 	1);
+			gridPane.add(bookConditionCombo, 1, 2);
 			
-			gridPane.add(bookNameField, 1, 1);
-			gridPane.add(originalPriceField, 1, 2);
-			gridPane.add(authorNameField, 1, 3);
-			gridPane.add(publishedYearField, 1, 4);
-			gridPane.add(sellingPriceField, 3, 4);
-			gridPane.add(bookCategoryCombo, 1, 	6);
-			gridPane.add(bookConditionCombo, 1, 7);
+			box3.add(sellingPriceLabel, 0, 1);
+			box3.add(sellingPriceField, 0, 2);
+			box3.add(listBookButton, 0, 0);
 			
-			gridPane.add(listBookButton, 3, 2);
+			userBox.add(userLabel, 0, 0);
+			userBox.add(roleLabel, 0, 1);
+			userBox.add(logoutButton, 0, 2);
 			
-			gridPane.add(calculateSellingPriceButton, 3, 5);
+			box3.add(calculateSellingPriceButton, 0, 3);
 			gridPane.setPadding(new Insets(10, 10, 10, 10));
 			gridPane.setHgap(10); 
 	        gridPane.setVgap(20);
+	        gridPane.setPrefSize(350,200);
+	        
+	        gridPane.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
+	        box1.setPrefSize(350, 200);
+	        box1.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
+	        box1.setPadding(new Insets(10, 10, 10, 10));
+	        box1.setHgap(10); 
+	        box1.setVgap(20);
+			
+	        userBox.setPadding(new Insets(10, 10, 100, 10));
+	        userBox.setHgap(10); 
+	        userBox.setVgap(10);
+	        
+	        VBox leftColumn = new VBox(20);
+	        box3.setPadding(new Insets(100, 10, 10, 100));
+	        box3.setHgap(10); 
+	        box3.setVgap(20);
+	        leftColumn.getChildren().addAll(box1, gridPane);
+	        
+	        
+			mainLayout.setLeft(leftColumn);
+			mainLayout.setCenter(box3);
+			mainLayout.setRight(userBox);
+			//mainLayout.setTop(userBox);
 	        
 	        
 	        
@@ -184,15 +248,10 @@ public class SellerView extends Application {
 	        
 	        
 	        
-	        
-	        
-	        
-	        
-	        
-			Scene scene = new Scene(gridPane, 400, 400);
+			Scene scene = new Scene(mainLayout, 900, 500);
 	        primaryStage.setScene(scene);
 	        primaryStage.show();
-	        System.out.println("\nsellerview");
+	        
 		}
 		
 		public static void setUserName(String userName2) {
