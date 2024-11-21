@@ -1,5 +1,9 @@
 package sunDevil_Books;
 
+
+import java.util.Random;
+import java.util.regex.Pattern;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -11,8 +15,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import java.sql.*;
 
 public class SellerView extends Application {
+	
 		private String bookName;
 		private String originalPrice;
 		private String authorName;
@@ -22,10 +28,10 @@ public class SellerView extends Application {
 		private String sellingPrice;
 		private static String userName;
 		private boolean isSellingPrice;
-				
+		
+		
 		public void start(Stage primaryStage)
 		{
-			
 			Label title1Label = new Label("Book Information");
 			Label title2Label = new Label("Selling Information");
 			Label bookNameLabel = new Label("Book Name: ");
@@ -62,27 +68,70 @@ public class SellerView extends Application {
 	            System.out.println("Selected: " + bookCondition);
 			});
 			calculateSellingPriceButton.setOnAction(e -> {
-				
-				
-				isSellingPrice = true;
 				bookName = bookNameField.getText();
-				originalPrice = originalPriceField.getText();
 				authorName = authorNameField.getText();
 				publishedYear = publishedYearField.getText();
-				sellingPriceField.setText("testing");
+				
+				
+				
+				boolean isYear = isYearFormat(publishedYear);
+				originalPrice = originalPriceField.getText();
+				boolean inCurrency = isCurrencyFormat(originalPrice);
+				if(inCurrency == true)
+				{
+					sellingPrice = calculateSellingPrice(bookCondition, originalPrice);
+					isSellingPrice = true;
+					if(bookName.isEmpty() || authorName.isEmpty() || isYear == false || bookCondition == null || bookCategory == null)
+					{
+						
+						Alert alert = new Alert(AlertType.ERROR);
+				        alert.setTitle("Error");
+				        alert.setHeaderText("Something went wrong!");
+				        alert.setContentText("Please fill out all details");
+				        alert.showAndWait();
+						//Add book to database
+						
+					}
+					else
+					{
+						
+						sellingPriceField.setText(sellingPrice);
+					}
+				}
+				else
+				{
+					Alert alert = new Alert(AlertType.ERROR);
+			        alert.setTitle("Error");
+			        alert.setHeaderText("Something went wrong!");
+			        alert.setContentText("Please enter a valid Currency.");
+			        alert.showAndWait();
+				}
+				
+				
+				
 				
 			});
 			listBookButton.setOnAction(e -> {
-				if(isSellingPrice == true)
+				
+				
+				
+				if(isSellingPrice == true )
 				{
-					bookName = bookNameField.getText();
-					originalPrice = originalPriceField.getText();
-					authorName = authorNameField.getText();
-					publishedYear = publishedYearField.getText();
+					createUser(bookCategory, bookName, authorName, publishedYear, sellingPrice, bookCondition);
 					
-					//Add book to database
-					
-					
+					 Alert alert = new Alert(AlertType.INFORMATION);
+			         alert.setTitle("Information");
+			         alert.setHeaderText("Book Sale");
+			         alert.setContentText("Book Sale Posted");
+			         alert.showAndWait();
+			         bookNameField.clear();
+					 originalPriceField.clear();  
+					 authorNameField.clear(); 
+					 publishedYearField.clear();  
+					 sellingPriceField.clear(); 
+					 bookCategoryCombo.setValue(null);
+					 bookConditionCombo.setValue(null);
+			         
 				}
 				else
 				{
@@ -91,6 +140,7 @@ public class SellerView extends Application {
 			        alert.setHeaderText("Something went wrong!");
 			        alert.setContentText("Please calculate selling Price.");
 			        alert.showAndWait();
+					
 				}
 				
 				
@@ -121,7 +171,13 @@ public class SellerView extends Application {
 			gridPane.setHgap(10); 
 	        gridPane.setVgap(20);
 	        
+	        gridPane.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #FFC627; " +
+                "-fx-border-width: 3px; " +
+                "-fx-border-style: solid; ");
+	        
 			Scene scene = new Scene(gridPane, 400, 400);
+			
 	        primaryStage.setScene(scene);
 	        primaryStage.show();
 	        System.out.println("\nsellerview");
@@ -130,6 +186,91 @@ public class SellerView extends Application {
 		public static void setUserName(String userName2) {
 	        userName = userName2;
 	    }
+		
+		
+		public static boolean isCurrencyFormat(String str) {
+		   // General pattern: optional currency symbol, optional commas, and two decimal places
+		     String currencyPattern = "^[\\$€₹¥]?[1-9]\\d{0,2}(,\\d{3})*(\\.\\d{2})?$";
+		     return Pattern.matches(currencyPattern, str);
+		 }
+		
+		 public static boolean isYearFormat(String str) {
+		        // Regex pattern for integers 0-2024
+		        String rangePattern = "^(202[0-4]|20[0-1]\\d|1\\d{3}|[1-9]\\d{0,2}|0)$";
+		        return Pattern.matches(rangePattern, str);
+		 }
+		 
+		 private boolean createUser(String category, String name, String author, String year, String price, String condition) {
+			 
+		        String insertQuery = "INSERT INTO books (book_id, category, name, author, publishing_year, price, book_condition) VALUES (?, ?, ?, ?, ?, ?, ?)"; // Default role: Buyer
+		        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+		            
+		             PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+
+		            // Check if username already exists
+		            // Generate a unique user ID
+		            String book_id = generateID();
+
+		            // Insert new user into the database
+		            insertStmt.setString(1, book_id);
+		            insertStmt.setString(2, category);
+		            insertStmt.setString(3, name);
+		            insertStmt.setString(4, author);
+		            insertStmt.setString(5, year);
+		            insertStmt.setString(6, price);
+		            insertStmt.setString(7, condition);
+		            insertStmt.executeUpdate();
+
+		            return true;
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+		        return false;
+		    }
+		 
+		 private String generateID()
+		{
+				Random random = new Random();
+				
+		        int randINT = 10000 + random.nextInt(90000); 
+		        
+		        String randString = Integer.toString(randINT);
+				return randString;
+		}
+		 
+		 private String calculateSellingPrice(String condition, String price)
+		 {
+			 
+			 if( price.startsWith("$")) 
+			 {
+				 price = price.substring(1);
+			 }
+			 
+			 double doublePrice = Double.parseDouble(price);
+			 
+			 switch (condition) {
+             case "Like New":
+                
+                 doublePrice = doublePrice * .85 ;
+                 break;
+             case "Used":
+            	 doublePrice = doublePrice * .75 ;
+             	break;
+             case "Moderately Used":
+            	 doublePrice = doublePrice * .65 ;
+            	 break;
+             case "Heavily Used":
+            	 doublePrice = doublePrice * .55 ;
+            	 break;
+             default:
+                 // Show full name for non-admin users
+                 break;
+			 }
+			 
+			 String newPrice = String.format("%.2f", doublePrice);
+			 return newPrice;
+		 }
+		    
 		public static void main(String[] args) 
 		{
 			launch(args);

@@ -26,29 +26,25 @@ public class LoginView extends Application {
         passwordField = new PasswordField();
         passwordField.setPromptText("Password");
 
-        Button loginButton = new Button("Login");
-        Button createAccountButton = new Button("Create Account");
-        Button backButton = new Button("Back");
-        Button forgotPasswordButton = new Button("Forgot Password");
+        Button loginButton = Utils.createStyledButton("Login");
+        Button createAccountButton = Utils.createStyledButton("Create Account");
+        Button backButton = Utils.createStyledButton("Back");
+        Button forgotPasswordButton = Utils.createStyledButton("Forgot Password");
 
         loginStatusLabel = new Label();
 
-        // Event for login button
         loginButton.setOnAction(e -> handleLogin(primaryStage));
 
-        // Event for create account button
         createAccountButton.setOnAction(e -> {
             CreateAccountView createAccountView = new CreateAccountView();
             createAccountView.start(primaryStage); // Switch to Create Account View
         });
 
-        // Event for back button
         backButton.setOnAction(e -> {
             SplashScreenView splashScreenView = new SplashScreenView();
             splashScreenView.start(primaryStage); // Switch back to splash screen
         });
         
-        // Event for forgot password
         forgotPasswordButton.setOnAction(e -> {
             ForgotPasswordView forgotPasswordView = new ForgotPasswordView();
             forgotPasswordView.start(primaryStage); // Switch to Forgot Password view
@@ -57,10 +53,7 @@ public class LoginView extends Application {
 
         // Layout for the login screen
         VBox layout = new VBox(10, usernameField, passwordField, loginButton, createAccountButton, forgotPasswordButton, backButton, loginStatusLabel);
-        layout.setStyle("-fx-background-color: white; " +
-                "-fx-border-color: #FFC627; " +
-                "-fx-border-width: 3px; " +
-                "-fx-border-style: solid; ");
+        layout.setStyle("-fx-background-color: white; -fx-border-color: #FFC627; -fx-border-width: 3px; -fx-border-style: solid;");
         
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
@@ -84,9 +77,6 @@ public class LoginView extends Application {
         if (DatabaseOperations.authenticateUser(username, password)) {
             loginStatusLabel.setText("Login successful!");
 
-            // Fetch role and redirect accordingly
-         // Fetch username and role and redirect accordingly
-         // Fetch first name, last name, username, and role, and redirect accordingly
             // Call the function to check login
             if (DatabaseOperations.authenticateUser(username, password)) {
                 loginStatusLabel.setText("Login successful!");
@@ -100,23 +90,21 @@ public class LoginView extends Application {
                 if (role != null) {
                     switch (role) {
                         case "Admin":
-                            // Pass full user info to AdminView
                             AdminView adminView = new AdminView(firstName, lastName, username, userId);
-                            adminView.start(stage); // Redirect to AdminView
+                            adminView.start(stage); 
                             break;
                             
                         case "Buyer":
-                        	BuyerView buyerView = new BuyerView(username);
+                        	BuyerView buyerView = new BuyerView(firstName, lastName, username, userId);
                         	buyerView.start(stage);
                         	break;
                         	
                         case "Seller":
-                        	// TODO
+                        	SellerView sellerView = new SellerView();
+                        	sellerView.start(stage);
                         	break;
                         	
                         default:
-                            // Show full name for non-admin users
-                            loginStatusLabel.setText("Welcome, " + firstName + " " + lastName + " (" + userId + ")!");
                             break;
                     }
                 }

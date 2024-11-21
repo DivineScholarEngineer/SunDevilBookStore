@@ -35,8 +35,8 @@ public class CreateAccountView extends Application {
         passwordField = new PasswordField();
         passwordField.setPromptText("Password");
 
-        Button createAccountButton = new Button("Create Account");
-        Button backButton = new Button("Back");
+        Button createAccountButton = Utils.createStyledButton("Create Account");
+        Button backButton = Utils.createStyledButton("Back");
 
         accountStatusLabel = new Label();
 
@@ -51,10 +51,7 @@ public class CreateAccountView extends Application {
 
         // Layout for the create account screen
         VBox layout = new VBox(10, firstNameField, lastNameField, usernameField, passwordField, createAccountButton, backButton, accountStatusLabel);
-        layout.setStyle("-fx-background-color: white; " +
-                "-fx-border-color: #FFC627; " +
-                "-fx-border-width: 3px; " +
-                "-fx-border-style: solid; ");
+        layout.setStyle("-fx-background-color: white; -fx-border-color: #FFC627; -fx-border-width: 3px; -fx-border-style: solid;");
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
 

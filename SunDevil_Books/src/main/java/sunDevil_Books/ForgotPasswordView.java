@@ -30,8 +30,8 @@ public class ForgotPasswordView extends Application {
         newPasswordField = new PasswordField();
         newPasswordField.setPromptText("Enter new password");
 
-        Button resetPasswordButton = new Button("Reset Password");
-        Button backButton = new Button("Back");
+        Button resetPasswordButton = Utils.createStyledButton("Reset Password");
+        Button backButton = Utils.createStyledButton("Back");
 
         resetStatusLabel = new Label();
 
@@ -42,10 +42,7 @@ public class ForgotPasswordView extends Application {
         });
 
         VBox layout = new VBox(10, userIdField, newPasswordField, resetPasswordButton, backButton, resetStatusLabel);
-        layout.setStyle("-fx-background-color: white; " +
-                "-fx-border-color: #FFC627; " +
-                "-fx-border-width: 3px; " +
-                "-fx-border-style: solid; ");
+        layout.setStyle("-fx-background-color: white; -fx-border-color: #FFC627;-fx-border-width: 3px; -fx-border-style: solid; ");
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
 

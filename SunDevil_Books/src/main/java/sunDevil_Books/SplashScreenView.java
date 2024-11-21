@@ -27,8 +27,8 @@ public class SplashScreenView extends Application {
         logoView.setPreserveRatio(true); 
 
         // Login and Create Account buttons
-        Button loginButton = new Button("Login");
-        Button createAccountButton = new Button("Create Account");
+        Button loginButton = Utils.createStyledButton("Login");
+        Button createAccountButton = Utils.createStyledButton("Create Account");
 
         // Button styling and positioning
         VBox buttonBox = new VBox(20, loginButton, createAccountButton);
@@ -56,10 +56,7 @@ public class SplashScreenView extends Application {
 
         // Splash screen layout with app name and buttons
         VBox vbox = new VBox(10, logoView, buttonBox);
-        vbox.setStyle("-fx-background-color: white; " +
-                "-fx-border-color: #FFC627; " +
-                "-fx-border-width: 3px; " +
-                "-fx-border-style: solid; ");
+        vbox.setStyle("-fx-background-color: white; -fx-border-color: #FFC627; -fx-border-width: 3px; -fx-border-style: solid; ");
         
         vbox.setAlignment(Pos.CENTER);
 

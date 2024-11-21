@@ -44,7 +44,7 @@ public class AdminView extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Admin Management");
 
-         DatabaseOperations.initializeDatabase();
+        DatabaseOperations.initializeDatabase();
 
         // Layout for the top (logo, admin details, log out button)
         HBox topBar = createTopBar(primaryStage);
@@ -77,10 +77,7 @@ public class AdminView extends Application {
 
         // Set up the main layout
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: white; " +
-                "-fx-border-color: #FFC627; " +
-                "-fx-border-width: 3px; " +
-                "-fx-border-style: solid; ");
+        borderPane.setStyle("-fx-background-color: white; -fx-border-color: #FFC627; -fx-border-width: 3px; -fx-border-style: solid; ");
         borderPane.setTop(topBar);
         borderPane.setCenter(tabPane);
         borderPane.setPadding(new Insets(20));
@@ -90,28 +87,21 @@ public class AdminView extends Application {
         primaryStage.show();
     }
 
-    // Function to create the top bar with logo, admin info, and log out button
     private HBox createTopBar(Stage stage) {
-        // Logo section
-        File file = new File("C:\\Users\\divin\\eclipse-workspace\\SunDevil_Books\\src\\sunDevil_Books\\sundevilbooks.png");
         Image logoImage;
-        if (file.exists()) {
-            logoImage = new Image(file.toURI().toString());
+        InputStream logoStream = getClass().getResourceAsStream("sundevilbooks.png");
+        if (logoStream != null) {
+            logoImage = new Image(logoStream);
         } else {
-            InputStream logoStream = getClass().getResourceAsStream("/sunDevil_Books/sundevilbooks.png");
-            if (logoStream != null) {
-                logoImage = new Image(logoStream);
-            } else {
-                logoImage = null;
-                Utils.showAlert(Alert.AlertType.ERROR, "Default logo image not found.");
-            }
+            logoImage = null;
+            Utils.showAlert(Alert.AlertType.ERROR, "Default logo image not found.");
         }
 
         logoImageView = new ImageView(logoImage);
         logoImageView.setFitWidth(200);
         logoImageView.setFitHeight(100);
 
-        Button uploadLogoButton = new Button("Change Logo");
+        Button uploadLogoButton = Utils.createStyledButton("Change Logo");
         uploadLogoButton.setOnAction(e -> uploadLogo(stage));
 
         VBox logoBox = new VBox(10, logoImageView, uploadLogoButton);
@@ -128,8 +118,7 @@ public class AdminView extends Application {
 
 
         // Log out button
-        Button logoutButton = new Button("Log Out");
-        logoutButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button logoutButton = Utils.createStyledButton("Log Out");
         logoutButton.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
             alert.showAndWait();
@@ -138,11 +127,6 @@ public class AdminView extends Application {
             SplashScreenView splashScreenView = new SplashScreenView();
             splashScreenView.start(stage); // Go back to splash screen
         });
-//        logoutButton.setOnAction(e -> {
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
-//            alert.showAndWait();
-//            Platform.exit(); // Exits the entire application
-//        });
 
         VBox logoutBox = new VBox(logoutButton);
         logoutBox.setAlignment(Pos.CENTER_RIGHT);
@@ -176,8 +160,7 @@ public class AdminView extends Application {
         addBooksPane.setAlignment(Pos.CENTER);
         addBooksPane.setPadding(new Insets(10));
 
-        Label addBookTitle = new Label("Add Books");
-        addBookTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label addBookTitle = Utils.createStyledLabel("Add Books");
 
         ComboBox<String> bookCategoryComboBox = new ComboBox<>();
         bookCategoryComboBox.getItems().addAll("Natural Science", "Engineering", "Literature", "Other");
@@ -199,8 +182,7 @@ public class AdminView extends Application {
         conditionComboBox.getItems().addAll("New", "Used", "Heavily Used");
         conditionComboBox.setPromptText("Select Condition");
 
-        Button addBookButton = new Button("Add Book");
-        addBookButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button addBookButton = Utils.createStyledButton("Add Book");
 
         addBookButton.setOnAction(e -> {
             String category = bookCategoryComboBox.getValue();
@@ -262,8 +244,7 @@ public class AdminView extends Application {
         editBooksPane.setAlignment(Pos.CENTER);
         editBooksPane.setPadding(new Insets(10));
 
-        Label editBookTitle = new Label("Edit Books");
-        editBookTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label editBookTitle = Utils.createStyledLabel("Edit Books");
 
         TextField bookIdField = new TextField();
         bookIdField.setPromptText("Enter Book ID");
@@ -288,8 +269,7 @@ public class AdminView extends Application {
         editBookCategoryComboBox.getItems().addAll("Natural Science", "Engineering", "Literature", "Other");
         editBookCategoryComboBox.setPromptText("Select Category");
 
-        Button editBookButton = new Button("Edit Book");
-        editBookButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button editBookButton = Utils.createStyledButton("Edit Book");
 
         editBookButton.setOnAction(e -> {
             String bookIdStr = bookIdField.getText().trim();
@@ -370,14 +350,12 @@ public class AdminView extends Application {
         removeBooksPane.setAlignment(Pos.CENTER);
         removeBooksPane.setPadding(new Insets(10));
 
-        Label removeBookTitle = new Label("Remove Books");
-        removeBookTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label removeBookTitle = Utils.createStyledLabel("Remove Books");
 
         TextField removeBookIdField = new TextField();
         removeBookIdField.setPromptText("Enter Book ID");
 
-        Button removeBookButton = new Button("Remove Book");
-        removeBookButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button removeBookButton = Utils.createStyledButton("Remove Book");
 
         removeBookButton.setOnAction(e -> {
             String bookIdStr = removeBookIdField.getText().trim();
@@ -414,8 +392,7 @@ public class AdminView extends Application {
         addUserPane.setAlignment(Pos.CENTER);
         addUserPane.setPadding(new Insets(10));
 
-        Label addUserTitle = new Label("Add Users");
-        addUserTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label addUserTitle = Utils.createStyledLabel("Add Users");
 
         ComboBox<String> userRoleComboBox = new ComboBox<>();
         userRoleComboBox.getItems().addAll("Buyer", "Seller", "Admin");
@@ -430,8 +407,7 @@ public class AdminView extends Application {
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter a password");
 
-        Button addUserButton = new Button("Add User");
-        addUserButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button addUserButton = Utils.createStyledButton("Add User");
 
         addUserButton.setOnAction(e -> {
             String role = userRoleComboBox.getValue();
@@ -475,8 +451,7 @@ public class AdminView extends Application {
         editUserPane.setAlignment(Pos.CENTER);
         editUserPane.setPadding(new Insets(10));
 
-        Label editUserTitle = new Label("Edit Users");
-        editUserTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label editUserTitle = Utils.createStyledLabel("Edit Users");
 
         TextField editUserIdField = new TextField();
         editUserIdField.setPromptText("Enter an ASU ID");
@@ -488,8 +463,7 @@ public class AdminView extends Application {
         editUserRoleComboBox.getItems().addAll("Buyer", "Seller", "Admin");
         editUserRoleComboBox.setPromptText("Select New Role");
 
-        Button editUserButton = new Button("Edit User");
-        editUserButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button editUserButton = Utils.createStyledButton("Edit User");
 
         editUserButton.setOnAction(e -> {
             String userId = editUserIdField.getText().trim();
@@ -524,14 +498,12 @@ public class AdminView extends Application {
         removeUserPane.setAlignment(Pos.CENTER);
         removeUserPane.setPadding(new Insets(10));
 
-        Label removeUserTitle = new Label("Remove Users");
-        removeUserTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label removeUserTitle = Utils.createStyledLabel("Remove Users");
 
         TextField removeUserIdField = new TextField();
         removeUserIdField.setPromptText("Enter an ASU ID");
 
-        Button removeUserButton = new Button("Remove User");
-        removeUserButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button removeUserButton = Utils.createStyledButton("Remove User");
 
         removeUserButton.setOnAction(e -> {
             String userId = removeUserIdField.getText().trim();
@@ -570,8 +542,7 @@ public class AdminView extends Application {
         reportCategoryComboBox.getItems().addAll("Books and Sales", "Users", "Transactions", "Inventory", "Revenue");
         reportCategoryComboBox.setPromptText("Select Category");
 
-        Button generateReportButton = new Button("Generate Report");
-        generateReportButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button generateReportButton = Utils.createStyledButton("Generate Report");
         generateReportButton.setOnAction(e -> generateReport(reportCategoryComboBox.getValue()));
 
         VBox reportsBox = new VBox(15, transactionsLabel, transactionBookIdsBox, reportCategoryLabel, reportCategoryComboBox, generateReportButton);
