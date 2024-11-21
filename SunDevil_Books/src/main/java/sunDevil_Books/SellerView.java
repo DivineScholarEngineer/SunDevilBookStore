@@ -35,6 +35,10 @@ public class SellerView extends Application {
 		private static String userName;
 		private boolean isSellingPrice;
 		
+		public SellerView(String userName) {
+			this.userName = userName;
+		}
+		
 		
 		public void start(Stage primaryStage)
 		{
