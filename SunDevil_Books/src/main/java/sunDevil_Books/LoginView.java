@@ -19,7 +19,6 @@ public class LoginView extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Login");
 
-        // UI elements for the login screen
         usernameField = new TextField();
         usernameField.setPromptText("Username");
 
@@ -100,7 +99,7 @@ public class LoginView extends Application {
                         	break;
                         	
                         case "Seller":
-                        	SellerView sellerView = new SellerView();
+                        	SellerView sellerView = new SellerView(username);
                         	sellerView.start(stage);
                         	break;
                         	
