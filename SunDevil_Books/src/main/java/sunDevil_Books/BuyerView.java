@@ -1,4 +1,3 @@
-// BuyerView.java
 package sunDevil_Books;
 
 import javafx.application.Application;
@@ -6,346 +5,168 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.sql.*;
-
 public class BuyerView extends Application {
-    private String userId;
+    
+    private String firstName;
+    private String lastName;
     private String username;
+    private String userId;
 
-    private ListView<String> booksListView;
-    private Label statusLabel;
-
-    public BuyerView(String userId, String username) {
-        this.userId = userId;
+    // do we even need userId?
+    public BuyerView(String firstName, String lastName, String username, String userId) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
+        this.userId = userId;
     }
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle(username + "'s Buyer Dashboard");
+        primaryStage.setTitle("Buyer View");
+        BorderPane mainLayout = new BorderPane();
+        
+        // apply this styling EVERYWHERE
+        mainLayout.setStyle("-fx-background-color: white; -fx-border-color: #FFC627; -fx-border-width: 3px; -fx-border-style: solid;");
+        mainLayout.setPadding(new Insets(20));
 
-        Label welcomeLabel = new Label("Welcome, " + getFirstName() + "!");
-        welcomeLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        HBox topSection = new HBox();
+        topSection.setAlignment(Pos.CENTER);
 
-        Button hamburgerMenu = new Button("☰");
-        Button logoutButton = new Button("Logout");
-        HBox topBar = new HBox(10, hamburgerMenu, logoutButton);
-        topBar.setAlignment(Pos.CENTER_RIGHT);
-        topBar.setPadding(new Insets(10));
+        ImageView logoView = new ImageView();
+        Image logo = new Image(getClass().getResourceAsStream("sundevilbooks.png"));
+        logoView.setImage(logo);
+        logoView.setFitWidth(200);  
+        logoView.setFitHeight(100); 
+        logoView.setPreserveRatio(true); 
 
+        // User Info
+        Button logoutButton = Utils.createStyledButton("Log Out");
         logoutButton.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
             alert.showAndWait();
 
             SplashScreenView splashScreenView = new SplashScreenView();
-            splashScreenView.start(primaryStage);
+            splashScreenView.start(primaryStage); // Go back to splash screen
         });
+        
+        VBox userInfoBox = new VBox(5);
+        userInfoBox.getChildren().addAll(
+            new Label("User: " + username),
+            new Label("Role: Buyer"),
+            logoutButton
+        );
+        userInfoBox.setAlignment(Pos.TOP_RIGHT);
+        HBox.setHgrow(userInfoBox, Priority.ALWAYS);
+        topSection.getChildren().addAll(logoView, userInfoBox);
 
-        booksListView = new ListView<>();
-        fetchBooks();
+        HBox mainContent = new HBox(30);
+        mainContent.setAlignment(Pos.CENTER);
 
-        Button purchaseButton = new Button("Purchase Book");
-        purchaseButton.setOnAction(e -> handlePurchase());
+        VBox filtersSection = new VBox(20);
+        filtersSection.setAlignment(Pos.TOP_LEFT);
+        
+        HBox filterBoxes = new HBox(20);
+        
+        VBox categorySection = new VBox(10);
+        categorySection.setAlignment(Pos.TOP_CENTER); 
+        Label categoryLabel = Utils.createStyledLabel("Category");
+        categoryLabel.setAlignment(Pos.CENTER);
+        
+        VBox categoryFilters = new VBox(5);
+        categoryFilters.setPadding(new Insets(10));
+        categoryFilters.setAlignment(Pos.TOP_LEFT);
+        
+        HBox scienceBox = new HBox(new CheckBox("Science"));
+        HBox engineeringBox = new HBox(new CheckBox("Engineering"));
+        HBox mathBox = new HBox(new CheckBox("Mathematics"));
+        
+        scienceBox.setAlignment(Pos.CENTER_LEFT);
+        engineeringBox.setAlignment(Pos.CENTER_LEFT);
+        mathBox.setAlignment(Pos.CENTER_LEFT);
+        
+        categoryFilters.getChildren().addAll(scienceBox, engineeringBox, mathBox);
+        categoryFilters.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
+        categoryFilters.setPrefSize(180, 200); 
+        categorySection.getChildren().addAll(categoryLabel, categoryFilters);
 
-        statusLabel = new Label();
+        // Condition Filters
+        VBox conditionSection = new VBox(10);
+        conditionSection.setAlignment(Pos.TOP_CENTER);
+        Label conditionLabel = Utils.createStyledLabel("Condition");
+        
+        conditionLabel.setAlignment(Pos.CENTER);
+        
+        VBox conditionFilters = new VBox(5);
+        conditionFilters.setPadding(new Insets(10));
+        conditionFilters.setAlignment(Pos.TOP_LEFT);
+        
+        HBox newBox = new HBox(new CheckBox("New"));
+        HBox usedBox = new HBox(new CheckBox("Used"));
+        HBox heavilyUsedBox = new HBox(new CheckBox("Heavily Used"));
+        
+        newBox.setAlignment(Pos.CENTER_LEFT);
+        usedBox.setAlignment(Pos.CENTER_LEFT);
+        heavilyUsedBox.setAlignment(Pos.CENTER_LEFT);
+        
+        conditionFilters.getChildren().addAll(newBox, usedBox, heavilyUsedBox);
+        conditionFilters.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
+        conditionFilters.setPrefSize(180, 200);
+        conditionSection.getChildren().addAll(conditionLabel, conditionFilters);
 
-        hamburgerMenu.setOnAction(e -> openSettingsWindow(primaryStage));
+        filterBoxes.getChildren().addAll(categorySection, conditionSection);
+        
+        Button applyFiltersButton = Utils.createStyledButton("Apply Filters");
 
-        VBox layout = new VBox(10, welcomeLabel, topBar, booksListView, purchaseButton, statusLabel);
-        layout.setPadding(new Insets(20));
+        HBox applyFilterButtonBox = new HBox(applyFiltersButton);
+        applyFilterButtonBox.setAlignment(Pos.CENTER);
+        filtersSection.getChildren().addAll(filterBoxes, applyFilterButtonBox);
 
-        Scene scene = new Scene(layout, 450, 600);
+        VBox bookListSection = new VBox(10);
+        bookListSection.setAlignment(Pos.TOP_CENTER);
+        
+        Label bookListLabel = Utils.createStyledLabel("Book List");
+        VBox bookList = new VBox(5);
+        bookList.setPadding(new Insets(10));
+        bookList.setAlignment(Pos.TOP_LEFT);
+        
+        HBox book1 = new HBox(new CheckBox("Book 1 - Science - $50 - New"));
+        HBox book2 = new HBox(new CheckBox("Book 2 - Engineering - $45 - Used"));
+        HBox book3 = new HBox(new CheckBox("Book 3 - Mathematics - $60 - New"));
+        HBox book4 = new HBox(new CheckBox("Book 4 - Literature - $30 - Used"));
+        
+        book1.setAlignment(Pos.CENTER_LEFT);
+        book2.setAlignment(Pos.CENTER_LEFT);
+        book3.setAlignment(Pos.CENTER_LEFT);
+        book4.setAlignment(Pos.CENTER_LEFT);
+        
+        bookList.getChildren().addAll(book1, book2, book3, book4);
+        bookList.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
+        bookList.setPrefSize(500, 400);
+
+        HBox bottomControls = new HBox(10);
+        bottomControls.setAlignment(Pos.CENTER);
+        
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search for a specific book");
+        searchField.setPrefWidth(300);
+        
+        Button createOrderButton = Utils.createStyledButton("Create Order");
+
+        bottomControls.getChildren().addAll(searchField, createOrderButton);
+        bookListSection.getChildren().addAll(bookListLabel, bookList, bottomControls);
+        mainContent.getChildren().addAll(filtersSection, bookListSection);
+
+        mainLayout.setTop(topSection);
+        mainLayout.setCenter(mainContent);
+
+        Scene scene = new Scene(mainLayout, 900, 500);
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    private void fetchBooks() {
-        String query = "SELECT book_id, name, author, price FROM books";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-
-            booksListView.getItems().clear();
-            while (rs.next()) {
-                int bookId = rs.getInt("book_id");
-                String name = rs.getString("name");
-                String author = rs.getString("author");
-                double price = rs.getDouble("price");
-                booksListView.getItems().add(bookId + " - " + name + " by " + author + " ($" + price + ")");
-            }
-        } catch (SQLException e) {
-            statusLabel.setText("Error fetching books: " + e.getMessage());
-        }
-    }
-
-    private void handlePurchase() {
-        String selectedBook = booksListView.getSelectionModel().getSelectedItem();
-        if (selectedBook == null) {
-            statusLabel.setText("Please select a book to purchase.");
-            return;
-        }
-
-        String[] bookDetails = selectedBook.split(" - ");
-        int bookId = Integer.parseInt(bookDetails[0]);
-
-        String query = "DELETE FROM books WHERE book_id = ?";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setInt(1, bookId);
-            int rowsDeleted = stmt.executeUpdate();
-
-            if (rowsDeleted > 0) {
-                statusLabel.setText("Book purchased successfully!");
-                fetchBooks();
-            } else {
-                statusLabel.setText("Error: Book not found.");
-            }
-        } catch (SQLException e) {
-            statusLabel.setText("Error purchasing book: " + e.getMessage());
-        }
-    }
-
-    private void openSettingsWindow(Stage currentStage) {
-        Stage settingsStage = new Stage();
-        settingsStage.setTitle("Settings");
-
-        VBox settingsLayout = new VBox(10);
-        settingsLayout.setPadding(new Insets(20));
-
-        Button switchToSellerButton = new Button();
-        Button requestSellerAccessButton = new Button();
-        Button displayUserInfoButton = new Button("Display User Info");
-        Button changePasswordButton = new Button("Change Password");
-
-        updateSellerButtons(switchToSellerButton, requestSellerAccessButton);
-
-        switchToSellerButton.setOnAction(e -> {
-            switchToSeller(currentStage);
-            settingsStage.close();
-        });
-
-        requestSellerAccessButton.setOnAction(e -> {
-            handleSellerAccessRequest(requestSellerAccessButton, switchToSellerButton);
-        });
-
-        displayUserInfoButton.setOnAction(e -> displayUserInfo());
-
-        changePasswordButton.setOnAction(e -> changePassword());
-
-        settingsLayout.getChildren().addAll(switchToSellerButton, requestSellerAccessButton, displayUserInfoButton, changePasswordButton);
-
-        Scene settingsScene = new Scene(settingsLayout, 300, 250);
-        settingsStage.setScene(settingsScene);
-        settingsStage.show();
-    }
-
-    private void updateSellerButtons(Button switchToSellerButton, Button requestSellerAccessButton) {
-        String role = getUserRole();
-
-        if (role.contains("Seller") || role.equals("Admin")) {
-            switchToSellerButton.setText("Switch to Seller View");
-            switchToSellerButton.setDisable(false);
-
-            requestSellerAccessButton.setText("Cancel Seller Access");
-            requestSellerAccessButton.setDisable(false);
-        } else {
-            switchToSellerButton.setText("Switch to Seller View");
-            switchToSellerButton.setDisable(true);
-
-            if (hasPendingSellerRequest()) {
-                requestSellerAccessButton.setText("Cancel Seller Access Request");
-            } else {
-                requestSellerAccessButton.setText("Request Seller Access");
-            }
-            requestSellerAccessButton.setDisable(false);
-        }
-    }
-
-    private boolean hasPendingSellerRequest() {
-        String query = "SELECT status FROM role_change_requests WHERE user_id = ? AND requested_role = 'Seller' ORDER BY request_date DESC LIMIT 1";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, userId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                String status = rs.getString("status");
-                return status.equals("Pending");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    private void handleSellerAccessRequest(Button requestSellerAccessButton, Button switchToSellerButton) {
-        String buttonText = requestSellerAccessButton.getText();
-        if (buttonText.equals("Request Seller Access")) {
-            requestSellerAccess();
-            requestSellerAccessButton.setText("Cancel Seller Access Request");
-        } else if (buttonText.equals("Cancel Seller Access Request")) {
-            cancelSellerAccessRequest();
-            requestSellerAccessButton.setText("Request Seller Access");
-        } else if (buttonText.equals("Cancel Seller Access")) {
-            confirmCancelSellerAccess(requestSellerAccessButton, switchToSellerButton);
-        }
-    }
-
-    private void requestSellerAccess() {
-        String insertQuery = "INSERT INTO role_change_requests (user_id, requested_role) VALUES (?, 'Seller')";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-            insertStmt.setString(1, userId);
-            insertStmt.executeUpdate();
-            statusLabel.setText("Seller access request sent to admin.");
-        } catch (SQLException e) {
-            statusLabel.setText("Error requesting seller access: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void cancelSellerAccessRequest() {
-        String deleteQuery = "DELETE FROM role_change_requests WHERE user_id = ? AND status = 'Pending' AND requested_role = 'Seller'";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
-
-            stmt.setString(1, userId);
-            int rowsDeleted = stmt.executeUpdate();
-            if (rowsDeleted > 0) {
-                statusLabel.setText("Seller access request canceled.");
-            } else {
-                statusLabel.setText("No pending request found.");
-            }
-
-        } catch (SQLException e) {
-            statusLabel.setText("Error canceling request: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void confirmCancelSellerAccess(Button requestSellerAccessButton, Button switchToSellerButton) {
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmDialog.setTitle("Confirm Cancellation");
-        confirmDialog.setHeaderText("Are you sure you want to cancel Seller Access?");
-        confirmDialog.setContentText("This will remove your seller privileges.");
-
-        ButtonType yesButton = new ButtonType("Yes");
-        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        confirmDialog.getButtonTypes().setAll(yesButton, cancelButton);
-
-        confirmDialog.showAndWait().ifPresent(type -> {
-            if (type == yesButton) {
-                cancelSellerAccess();
-                requestSellerAccessButton.setText("Request Seller Access");
-                switchToSellerButton.setDisable(true);
-            }
-        });
-    }
-
-    private void cancelSellerAccess() {
-        String updateQuery = "UPDATE users SET role = ? WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
-
-            String currentRole = getUserRole();
-            String newRole;
-            if (currentRole.equals("BuyerSeller")) {
-                newRole = "Buyer";
-            } else if (currentRole.equals("Seller")) {
-                newRole = "Buyer";
-            } else {
-                newRole = currentRole;
-            }
-
-            stmt.setString(1, newRole);
-            stmt.setString(2, userId);
-            int rowsUpdated = stmt.executeUpdate();
-            if (rowsUpdated > 0) {
-                statusLabel.setText("Seller access canceled.");
-            } else {
-                statusLabel.setText("Error updating user role.");
-            }
-
-        } catch (SQLException e) {
-            statusLabel.setText("Error canceling seller access: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void switchToSeller(Stage currentStage) {
-        currentStage.close();
-
-        SellerView sellerView = new SellerView(userId, username);
-        sellerView.start(new Stage());
-    }
-
-    private void displayUserInfo() {
-        String query = "SELECT first_name, last_name, role FROM users WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, userId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                String role = rs.getString("role");
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("User Info");
-                alert.setHeaderText("Your Information");
-                alert.setContentText("First Name: " + firstName + "\n" +
-                        "Last Name: " + lastName + "\n" +
-                        "User ID: " + userId + "\n" +
-                        "Role: " + role);
-                alert.showAndWait();
-            }
-        } catch (SQLException e) {
-            statusLabel.setText("Error displaying user info: " + e.getMessage());
-        }
-    }
-
-    private String getUserRole() {
-        String query = "SELECT role FROM users WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, userId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("role");
-            }
-        } catch (SQLException e) {
-            statusLabel.setText("Error fetching user role: " + e.getMessage());
-        }
-        return "Buyer";
-    }
-
-    private String getFirstName() {
-        String query = "SELECT first_name FROM users WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, userId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("first_name");
-            }
-        } catch (SQLException e) {
-            statusLabel.setText("Error fetching first name: " + e.getMessage());
-        }
-        return "";
-    }
-
-    private void changePassword() {
-        // Change password implementation (not provided in original code)
     }
 
     public static void main(String[] args) {
