@@ -1,356 +1,345 @@
 package sunDevil_Books;
 
-
-import java.util.Random;
-import java.util.regex.Pattern;
-
-
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-
-import javafx.scene.control.Alert.AlertType;
-
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
 
 import java.sql.*;
 
 public class SellerView extends Application {
-	
-	
-	
-		private String bookName;
-		private String originalPrice;
-		private String authorName;
-		private String publishedYear;
-		private String bookCategory;
-		private String bookCondition;
-		private String sellingPrice;
-		private static String userName;
-		private boolean isSellingPrice;
-		
-		public SellerView(String userName) {
-			this.userName = userName;
-		}
-		
-		
-		public void start(Stage primaryStage)
-		{
-			primaryStage.setTitle("Seller View");
-			BorderPane mainLayout = new BorderPane();
-			GridPane gridPane = new GridPane();
-			GridPane box1 = new GridPane();
-			GridPane box3 = new GridPane();
-			GridPane userBox = new GridPane();
-			ImageView logoView = new ImageView();
-	        /*Image logo = new Image(getClass().getResourceAsStream("sundevilbooks.png"));
-	        logoView.setImage(logo);
-	        logoView.setFitWidth(200);  
-	        logoView.setFitHeight(100); 
-	        logoView.setPreserveRatio(true);*/ 
-	        
-	        mainLayout.setStyle("-fx-background-color: white; -fx-border-color: #FFC627; -fx-border-width: 3px; -fx-border-style: solid;");
-	        mainLayout.setPadding(new Insets(50,20,50,150));
-	        
-	        
-			Label title1Label = Utils.createStyledLabel("Book Information");
-			Label title2Label = Utils.createStyledLabel("Selling Information");
-			Label bookNameLabel = new Label("Book Name: ");
-			Label originialPriceLabel = new Label("Originial Price: ");
-			Label authorNameLabel = new Label("Author: ");
-			Label publishedYearLabel = new Label("Published Year: ");
-			Label bookCategoryLabel= new Label("Book Category: ");
-			Label bookConditionLabel= new Label("Book Condition: ");
-			Label sellingPriceLabel= new Label("Selling Price: ");
-			
-			Label userLabel = new Label("User : " + userName);
-			Label roleLabel = new Label("Role: Seller");
-			
-			TextField bookNameField = new TextField(); 
-			TextField originalPriceField = new TextField(); 
-			TextField authorNameField = new TextField(); 
-			TextField publishedYearField = new TextField(); 
-			TextField sellingPriceField = new TextField(); 
-			
-			Button listBookButton = Utils.createStyledButton("List My Book");
-			Button calculateSellingPriceButton = Utils.createStyledButton("Calculate Selling Price");
-			Button logoutButton = Utils.createStyledButton("Log Out");
-			ComboBox<String> bookCategoryCombo = new ComboBox<>();
-			ComboBox<String> bookConditionCombo = new ComboBox<>();
-			
-			
-			bookCategoryCombo.getItems().addAll("Natural Science", "Computer", "Math", "English Language", "Other");
-			bookConditionCombo.getItems().addAll("Like New", "Used", "Moderately Used", "Heavily Used");
-			
-			
-			
-			
-			
-			
-			isSellingPrice = false;
-			bookCategoryCombo.setOnAction(event -> {
-				
-	            bookCategory = bookCategoryCombo.getValue();
-	            //System.out.println("Selected: " + bookCategory);
-			});
-			bookConditionCombo.setOnAction(event -> {
-	            bookCondition = bookConditionCombo.getValue();
-	            //System.out.println("Selected: " + bookCondition);
-			});
-			calculateSellingPriceButton.setOnAction(e -> {
-				bookName = bookNameField.getText();
-				authorName = authorNameField.getText();
-				publishedYear = publishedYearField.getText();
-				
-				
-				
-				boolean isYear = isYearFormat(publishedYear);
-				originalPrice = originalPriceField.getText();
-				boolean inCurrency = isCurrencyFormat(originalPrice);
-				if(inCurrency == true)
-				{
-					sellingPrice = calculateSellingPrice(bookCondition, originalPrice);
-					isSellingPrice = true;
-					if(bookName.isEmpty() || authorName.isEmpty() || isYear == false || bookCondition == null || bookCategory == null)
-					{
-						
-						Alert alert = new Alert(AlertType.ERROR);
-				        alert.setTitle("Error");
-				        alert.setHeaderText("Something went wrong!");
-				        alert.setContentText("Please fill out all details");
-				        alert.showAndWait();
-						//Add book to database
-						
-					}
-					else
-					{
-						
-						sellingPriceField.setText(sellingPrice);
-					}
-				}
-				else
-				{
-					Alert alert = new Alert(AlertType.ERROR);
-			        alert.setTitle("Error");
-			        alert.setHeaderText("Something went wrong!");
-			        alert.setContentText("Please enter a valid Currency.");
-			        alert.showAndWait();
-				}
-				
-				
-				
-				
-			});
-			listBookButton.setOnAction(e -> {
-				
-				
-				
-				if(isSellingPrice == true )
-				{
-					createUser(bookCategory, bookName, authorName, publishedYear, sellingPrice, bookCondition);
-					
-					 Alert alert = new Alert(AlertType.INFORMATION);
-			         alert.setTitle("Information");
-			         alert.setHeaderText("Book Sale");
-			         alert.setContentText("Book Sale Posted");
-			         alert.showAndWait();
-			         bookNameField.clear();
-					 originalPriceField.clear();  
-					 authorNameField.clear(); 
-					 publishedYearField.clear();  
-					 sellingPriceField.clear(); 
-					 bookCategoryCombo.setValue(null);
-					 bookConditionCombo.setValue(null);
-			         
-				}
-				else
-				{
-					Alert alert = new Alert(AlertType.ERROR);
-			        alert.setTitle("Error");
-			        alert.setHeaderText("Something went wrong!");
-			        alert.setContentText("Please calculate selling Price.");
-			        alert.showAndWait();
-					
-				}
-				
-				
-			});
-			logoutButton.setOnAction(e -> {
-				Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
-	            alert.showAndWait();
 
-	            SplashScreenView splashScreenView = new SplashScreenView();
-	            splashScreenView.start(primaryStage); // Go back to splash screen
-				
-			});
-			box1.add(title1Label, 1, 0);
-			box1.add(bookNameLabel, 0, 1);
-			box1.add(originialPriceLabel, 0, 2);
-			box1.add(authorNameLabel, 0, 3);
-			box1.add(publishedYearLabel, 0, 4);
-			box1.add(bookNameField, 1, 1);
-			box1.add(originalPriceField, 1, 2);
-			box1.add(authorNameField, 1, 3);
-			box1.add(publishedYearField, 1, 4);
-			
-			gridPane.add(title2Label, 1, 0);
-			gridPane.add(bookCategoryLabel, 0, 1);
-			gridPane.add(bookConditionLabel, 0, 2);
-			gridPane.add(bookCategoryCombo, 1, 	1);
-			gridPane.add(bookConditionCombo, 1, 2);
-			
-			box3.add(sellingPriceLabel, 0, 1);
-			box3.add(sellingPriceField, 0, 2);
-			box3.add(listBookButton, 0, 0);
-			
-			userBox.add(userLabel, 0, 0);
-			userBox.add(roleLabel, 0, 1);
-			userBox.add(logoutButton, 0, 2);
-			
-			box3.add(calculateSellingPriceButton, 0, 3);
-			gridPane.setPadding(new Insets(10, 10, 10, 10));
-			gridPane.setHgap(10); 
-	        gridPane.setVgap(20);
-	        gridPane.setPrefSize(350,200);
-	        
-	        gridPane.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
-	        box1.setPrefSize(350, 200);
-	        box1.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
-	        box1.setPadding(new Insets(10, 10, 10, 10));
-	        box1.setHgap(10); 
-	        box1.setVgap(20);
-			
-	        userBox.setPadding(new Insets(10, 10, 100, 10));
-	        userBox.setHgap(10); 
-	        userBox.setVgap(10);
-	        
-	        VBox leftColumn = new VBox(20);
-	        box3.setPadding(new Insets(100, 10, 10, 100));
-	        box3.setHgap(10); 
-	        box3.setVgap(20);
-	        leftColumn.getChildren().addAll(box1, gridPane);
-	        
-	        
-			mainLayout.setLeft(leftColumn);
-			mainLayout.setCenter(box3);
-			mainLayout.setRight(userBox);
-			//mainLayout.setTop(userBox);
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-	        
-			Scene scene = new Scene(mainLayout, 900, 500);
-	        primaryStage.setScene(scene);
-	        primaryStage.show();
-	        
-		}
-		
-		public static void setUserName(String userName2) {
-	        userName = userName2;
-	    }
-		
-		
-		public static boolean isCurrencyFormat(String str) {
-		   // General pattern: optional currency symbol, optional commas, and two decimal places
-		     String currencyPattern = "^[\\$€₹¥]?[1-9]\\d{0,2}(,\\d{3})*(\\.\\d{2})?$";
-		     return Pattern.matches(currencyPattern, str);
-		 }
-		
-		 public static boolean isYearFormat(String str) {
-		        // Regex pattern for integers 0-2024
-		        String rangePattern = "^(202[0-4]|20[0-1]\\d|1\\d{3}|[1-9]\\d{0,2}|0)$";
-		        return Pattern.matches(rangePattern, str);
-		 }
-		 
-		 private boolean createUser(String category, String name, String author, String year, String price, String condition) {
-			 
-		        String insertQuery = "INSERT INTO books (book_id, category, name, author, publishing_year, price, book_condition) VALUES (?, ?, ?, ?, ?, ?, ?)"; // Default role: Buyer
-		        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-		            
-		             PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+    private String userId;
+    private String username;
 
-		            // Check if username already exists
-		       
-		            
+    private ListView<String> booksListView;
+    private Label statusLabel;
 
-		            // Generate a unique user ID
-		            String book_id = generateID();
+    public SellerView(String userId, String username) {
+        this.userId = userId;
+        this.username = username;
+    }
 
-		            // Insert new user into the database
-		            insertStmt.setString(1, book_id);
-		            insertStmt.setString(2, category);
-		            insertStmt.setString(3, name);
-		            insertStmt.setString(4, author);
-		            insertStmt.setString(5, year);
-		            insertStmt.setString(6, price);
-		            insertStmt.setString(7, condition);
-		            insertStmt.executeUpdate();
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle(username + "'s Seller Dashboard");
 
-		            return true;
-		        } catch (SQLException e) {
-		            e.printStackTrace();
-		        }
-		        return false;
-		    }
-		 
-		 private String generateID()
-		{
-				Random random = new Random();
-				
-		        int randINT = 10000 + random.nextInt(90000); 
-		        
-		        String randString = Integer.toString(randINT);
-				return randString;
-		}
-		 
-		 private String calculateSellingPrice(String condition, String price)
-		 {
-			 
-			 if( price.startsWith("$")) 
-			 {
-				 price = price.substring(1);
-			 }
-			 
-			 double doublePrice = Double.parseDouble(price);
-			 
-			 switch (condition) {
-             case "Like New":
-                
-                 doublePrice = doublePrice * .85 ;
-                 break;
-             case "Used":
-            	 doublePrice = doublePrice * .75 ;
-             	break;
-             case "Moderately Used":
-            	 doublePrice = doublePrice * .65 ;
-            	 break;
-             case "Heavily Used":
-            	 doublePrice = doublePrice * .55 ;
-            	 break;
-             default:
-                 // Show full name for non-admin users
-                 break;
-			 }
-			 
-			 String newPrice = String.format("%.2f", doublePrice);
-			 return newPrice;
-		 }
-		    
-		public static void main(String[] args) 
-		{
-			launch(args);
-		}
+        // Welcome message
+        Label welcomeLabel = new Label("Welcome, " + getFirstName() + "!");
+        welcomeLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        // Top bar with Hamburger menu and Logout button
+        Button hamburgerMenu = new Button("☰");
+        Button logoutButton = new Button("Logout");
+        HBox topBar = new HBox(10, hamburgerMenu, logoutButton);
+        topBar.setAlignment(Pos.CENTER_RIGHT);
+        topBar.setPadding(new Insets(10));
+
+        // Logout button action
+        logoutButton.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
+            alert.showAndWait();
+
+            // Redirect to the splash screen instead of exiting the application
+            SplashScreenView splashScreenView = new SplashScreenView();
+            splashScreenView.start(primaryStage); // Go back to splash screen
+        });
+
+        // Books list and management buttons
+        booksListView = new ListView<>();
+        statusLabel = new Label();
+
+        fetchSellerBooks();
+
+        Button addBookButton = new Button("Add Book");
+        addBookButton.setOnAction(e -> addBook());
+
+        Button deleteBookButton = new Button("Delete Selected Book");
+        deleteBookButton.setOnAction(e -> deleteSelectedBook());
+
+        // Hamburger menu event - Open settings in a new window
+        hamburgerMenu.setOnAction(e -> openSettingsWindow(primaryStage));
+
+        // Layout
+        VBox layout = new VBox(10, welcomeLabel, topBar, booksListView, addBookButton, deleteBookButton, statusLabel);
+        layout.setPadding(new Insets(20));
+
+        Scene scene = new Scene(layout, 500, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void fetchSellerBooks() {
+        String query = "SELECT book_id, name, author, price FROM books WHERE seller_id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            booksListView.getItems().clear();
+            while (rs.next()) {
+                int bookId = rs.getInt("book_id");
+                String name = rs.getString("name");
+                String author = rs.getString("author");
+                double price = rs.getDouble("price");
+                booksListView.getItems().add(bookId + " - " + name + " by " + author + " ($" + price + ")");
+            }
+        } catch (SQLException e) {
+            statusLabel.setText("Error fetching books: " + e.getMessage());
+        }
+    }
+
+    private void addBook() {
+        // Open a new window to add book details
+        Stage addBookStage = new Stage();
+        addBookStage.setTitle("Add Book");
+
+        GridPane grid = new GridPane();
+        grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setPadding(new Insets(20));
+
+        TextField nameField = new TextField();
+        TextField authorField = new TextField();
+        TextField priceField = new TextField();
+
+        grid.add(new Label("Name:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Author:"), 0, 1);
+        grid.add(authorField, 1, 1);
+        grid.add(new Label("Price:"), 0, 2);
+        grid.add(priceField, 1, 2);
+
+        Button saveButton = new Button("Save");
+        saveButton.setOnAction(e -> {
+            String name = nameField.getText().trim();
+            String author = authorField.getText().trim();
+            double price;
+
+            try {
+                price = Double.parseDouble(priceField.getText().trim());
+            } catch (NumberFormatException ex) {
+                statusLabel.setText("Invalid price format.");
+                return;
+            }
+
+            String query = "INSERT INTO books (name, author, price, seller_id) VALUES (?, ?, ?, ?)";
+            try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+
+                stmt.setString(1, name);
+                stmt.setString(2, author);
+                stmt.setDouble(3, price);
+                stmt.setString(4, userId);
+                stmt.executeUpdate();
+
+                statusLabel.setText("Book added successfully!");
+                fetchSellerBooks();
+                addBookStage.close();
+            } catch (SQLException ex) {
+                statusLabel.setText("Error adding book: " + ex.getMessage());
+            }
+        });
+
+        grid.add(saveButton, 1, 3);
+
+        Scene scene = new Scene(grid, 300, 250);
+        addBookStage.setScene(scene);
+        addBookStage.show();
+    }
+
+    private void deleteSelectedBook() {
+        String selectedBook = booksListView.getSelectionModel().getSelectedItem();
+        if (selectedBook == null) {
+            statusLabel.setText("Please select a book to delete.");
+            return;
+        }
+
+        String[] bookDetails = selectedBook.split(" - ");
+        int bookId = Integer.parseInt(bookDetails[0]);
+
+        String query = "DELETE FROM books WHERE book_id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, bookId);
+            int rowsDeleted = stmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                statusLabel.setText("Book deleted successfully!");
+                fetchSellerBooks();
+            } else {
+                statusLabel.setText("Error: Book not found.");
+            }
+        } catch (SQLException e) {
+            statusLabel.setText("Error deleting book: " + e.getMessage());
+        }
+    }
+
+    private void openSettingsWindow(Stage currentStage) {
+        Stage settingsStage = new Stage();
+        settingsStage.setTitle("Settings");
+
+        VBox settingsLayout = new VBox(10);
+        settingsLayout.setPadding(new Insets(20));
+
+        Button switchToBuyerButton = new Button("Switch to Buyer View");
+        Button becomeBuyerButton = new Button("Become Buyer");
+        Button displayUserInfoButton = new Button("Display User Info");
+        Button changePasswordButton = new Button("Change Password");
+
+        // Event handlers
+        switchToBuyerButton.setOnAction(e -> {
+            if (hasBuyerRole()) {
+                switchToBuyer(currentStage);
+                settingsStage.close();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "You do not have Buyer access.", ButtonType.OK);
+                alert.showAndWait();
+            }
+        });
+
+        becomeBuyerButton.setOnAction(e -> becomeBuyer());
+
+        displayUserInfoButton.setOnAction(e -> displayUserInfo());
+
+        changePasswordButton.setOnAction(e -> changePassword());
+
+        settingsLayout.getChildren().addAll(switchToBuyerButton, becomeBuyerButton, displayUserInfoButton, changePasswordButton);
+
+        Scene settingsScene = new Scene(settingsLayout, 300, 250);
+        settingsStage.setScene(settingsScene);
+        settingsStage.show();
+    }
+
+    private void becomeBuyer() {
+        String role = getUserRole();
+        if (role.contains("Buyer")) {
+            statusLabel.setText("You are already a buyer.");
+            return;
+        }
+
+        if (role.equals("Admin")) {
+            statusLabel.setText("Admins already have all permissions.");
+            return;
+        }
+
+        // Update the user's role to include 'Buyer'
+        String newRole = role.equals("Seller") ? "BuyerSeller" : "Buyer";
+        String query = "UPDATE users SET role = ? WHERE user_id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, newRole);
+            stmt.setString(2, userId);
+            stmt.executeUpdate();
+            statusLabel.setText("You are now a buyer!");
+
+        } catch (SQLException e) {
+            statusLabel.setText("Error becoming buyer: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private boolean hasBuyerRole() {
+        String role = getUserRole();
+        return role.contains("Buyer") || role.equals("Admin") || role.equals("BuyerSeller");
+    }
+
+    private void switchToBuyer(Stage currentStage) {
+        // Close the current window
+        currentStage.close();
+
+        // Open BuyerView
+        BuyerView buyerView = new BuyerView(userId, username);
+        buyerView.start(new Stage());
+    }
+
+    private void displayUserInfo() {
+        String query = "SELECT first_name, last_name, role FROM users WHERE user_id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String role = rs.getString("role");
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("User Info");
+                alert.setHeaderText("Your Information");
+                alert.setContentText("First Name: " + firstName + "\n" +
+                        "Last Name: " + lastName + "\n" +
+                        "User ID: " + userId + "\n" +
+                        "Role: " + role);
+                alert.showAndWait();
+            }
+        } catch (SQLException e) {
+            statusLabel.setText("Error fetching user information: " + e.getMessage());
+        }
+    }
+
+    private void changePassword() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change Password");
+        dialog.setHeaderText("Enter a new password:");
+        dialog.setContentText("New Password:");
+
+        dialog.showAndWait().ifPresent(newPassword -> {
+            String query = "UPDATE users SET password = ? WHERE user_id = ?";
+            try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+
+                stmt.setString(1, newPassword);
+                stmt.setString(2, userId);
+                stmt.executeUpdate();
+                statusLabel.setText("Password updated successfully.");
+            } catch (SQLException e) {
+                statusLabel.setText("Error updating password: " + e.getMessage());
+            }
+        });
+    }
+
+    private String getFirstName() {
+        String query = "SELECT first_name FROM users WHERE user_id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("first_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Seller";
+    }
+
+    private String getUserRole() {
+        String query = "SELECT role FROM users WHERE user_id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("role");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Seller";
+    }
+
+    public static void main(String[] args) {
+        // Launch the application without hardcoded values
+        launch(args);
+    }
 }
