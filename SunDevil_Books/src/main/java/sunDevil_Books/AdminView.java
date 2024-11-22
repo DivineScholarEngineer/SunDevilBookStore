@@ -37,7 +37,7 @@ public class AdminView extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Admin Management");
 
-        initializeDatabase();
+        DatabaseOperations.initializeDatabase();
 
         HBox topBar = createTopBar(primaryStage);
         topBar.setPadding(new Insets(10));
@@ -73,25 +73,20 @@ public class AdminView extends Application {
     }
 
     private HBox createTopBar(Stage stage) {
-        File file = new File("C:\\Users\\divin\\git\\sunDevilBookStore\\SunDevil_Books\\src\\main\\java\\sunDevil_Books\\sundevilbooks.png"); // Adjust the path as needed
         Image logoImage;
-        if (file.exists()) {
-            logoImage = new Image(file.toURI().toString());
+        InputStream logoStream = getClass().getResourceAsStream("sundevilbooks.png");
+        if (logoStream != null) {
+            logoImage = new Image(logoStream);
         } else {
-            InputStream logoStream = getClass().getResourceAsStream("/sunDevil_Books/sundevilbooks.jpg");
-            if (logoStream != null) {
-                logoImage = new Image(logoStream);
-            } else {
-                logoImage = null;
-                showAlert(Alert.AlertType.ERROR, "Default logo image not found.");
-            }
+            logoImage = null;
+            Utils.showAlert(Alert.AlertType.ERROR, "Default logo image not found.");
         }
 
         logoImageView = new ImageView(logoImage);
         logoImageView.setFitWidth(200);
         logoImageView.setFitHeight(100);
 
-        Button uploadLogoButton = new Button("Change Logo");
+        Button uploadLogoButton = Utils.createStyledButton("Change Logo");
         uploadLogoButton.setOnAction(e -> uploadLogo(stage));
 
         VBox logoBox = new VBox(10, logoImageView, uploadLogoButton);
@@ -105,8 +100,7 @@ public class AdminView extends Application {
         userInfoBox.setAlignment(Pos.CENTER_RIGHT);
         userInfoBox.setPadding(new Insets(10));
 
-        Button logoutButton = new Button("Log Out");
-        logoutButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button logoutButton = Utils.createStyledButton("Log Out");
         logoutButton.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
             alert.showAndWait();
@@ -145,8 +139,7 @@ public class AdminView extends Application {
         addBooksPane.setAlignment(Pos.CENTER);
         addBooksPane.setPadding(new Insets(10));
 
-        Label addBookTitle = new Label("Add Books");
-        addBookTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label addBookTitle = Utils.createStyledLabel("Add Books");
 
         ComboBox<String> bookCategoryComboBox = new ComboBox<>();
         bookCategoryComboBox.getItems().addAll("Natural Science", "Engineering", "Literature", "Other");
@@ -168,8 +161,7 @@ public class AdminView extends Application {
         conditionComboBox.getItems().addAll("New", "Used", "Heavily Used");
         conditionComboBox.setPromptText("Select Condition");
 
-        Button addBookButton = new Button("Add Book");
-        addBookButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button addBookButton = Utils.createStyledButton("Add Book");
 
         addBookButton.setOnAction(e -> {
             String category = bookCategoryComboBox.getValue();
@@ -181,7 +173,7 @@ public class AdminView extends Application {
 
             if (category == null || name.isEmpty() || author.isEmpty() ||
                     yearStr.isEmpty() || priceStr.isEmpty() || condition == null) {
-                showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a book.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a book.");
                 return;
             }
 
@@ -191,7 +183,7 @@ public class AdminView extends Application {
                 year = Integer.parseInt(yearStr);
                 price = Double.parseDouble(priceStr);
             } catch (NumberFormatException ex) {
-                showAlert(Alert.AlertType.ERROR, "Invalid year or price format.");
+                Utils.showAlert(Alert.AlertType.ERROR, "Invalid year or price format.");
                 return;
             }
 
@@ -230,8 +222,7 @@ public class AdminView extends Application {
         editBooksPane.setAlignment(Pos.CENTER);
         editBooksPane.setPadding(new Insets(10));
 
-        Label editBookTitle = new Label("Edit Books");
-        editBookTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label editBookTitle = Utils.createStyledLabel("Edit Books");
 
         TextField bookIdField = new TextField();
         bookIdField.setPromptText("Enter Book ID");
@@ -256,8 +247,7 @@ public class AdminView extends Application {
         editBookCategoryComboBox.getItems().addAll("Natural Science", "Engineering", "Literature", "Other");
         editBookCategoryComboBox.setPromptText("Select Category");
 
-        Button editBookButton = new Button("Edit Book");
-        editBookButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button editBookButton = Utils.createStyledButton("Edit Book");
 
         editBookButton.setOnAction(e -> {
             String bookIdStr = bookIdField.getText().trim();
@@ -269,7 +259,7 @@ public class AdminView extends Application {
             String condition = editConditionComboBox.getValue();
 
             if (bookIdStr.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please enter Book ID to edit.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter Book ID to edit.");
                 return;
             }
 
@@ -277,13 +267,13 @@ public class AdminView extends Application {
             try {
                 bookId = Integer.parseInt(bookIdStr);
             } catch (NumberFormatException ex) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
+                Utils.showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
                 return;
             }
 
             if (category == null && name.isEmpty() && author.isEmpty() &&
                     yearStr.isEmpty() && priceStr.isEmpty() && condition == null) {
-                showAlert(Alert.AlertType.WARNING, "Please fill in at least one field to update.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please fill in at least one field to update.");
                 return;
             }
 
@@ -292,7 +282,7 @@ public class AdminView extends Application {
                 try {
                     year = Integer.parseInt(yearStr);
                 } catch (NumberFormatException ex) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid year format.");
+                    Utils.showAlert(Alert.AlertType.ERROR, "Invalid year format.");
                     return;
                 }
             }
@@ -302,7 +292,7 @@ public class AdminView extends Application {
                 try {
                     price = Double.parseDouble(priceStr);
                 } catch (NumberFormatException ex) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid price format.");
+                    Utils.showAlert(Alert.AlertType.ERROR, "Invalid price format.");
                     return;
                 }
             }
@@ -337,19 +327,17 @@ public class AdminView extends Application {
         removeBooksPane.setAlignment(Pos.CENTER);
         removeBooksPane.setPadding(new Insets(10));
 
-        Label removeBookTitle = new Label("Remove Books");
-        removeBookTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label removeBookTitle = Utils.createStyledLabel("Remove Books");
 
         TextField removeBookIdField = new TextField();
         removeBookIdField.setPromptText("Enter Book ID");
 
-        Button removeBookButton = new Button("Remove Book");
-        removeBookButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button removeBookButton = Utils.createStyledButton("Remove Book");
 
         removeBookButton.setOnAction(e -> {
             String bookIdStr = removeBookIdField.getText().trim();
             if (bookIdStr.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please enter Book ID to remove.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter Book ID to remove.");
                 return;
             }
 
@@ -357,7 +345,7 @@ public class AdminView extends Application {
             try {
                 bookId = Integer.parseInt(bookIdStr);
             } catch (NumberFormatException ex) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
+                Utils.showAlert(Alert.AlertType.ERROR, "Invalid Book ID format.");
                 return;
             }
 
@@ -379,8 +367,7 @@ public class AdminView extends Application {
         addUserPane.setAlignment(Pos.CENTER);
         addUserPane.setPadding(new Insets(10));
 
-        Label addUserTitle = new Label("Add Users");
-        addUserTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label addUserTitle = Utils.createStyledLabel("Add Users");
 
         ComboBox<String> userRoleComboBox = new ComboBox<>();
         userRoleComboBox.getItems().addAll("Buyer", "Seller", "Admin");
@@ -401,8 +388,7 @@ public class AdminView extends Application {
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter Password");
 
-        Button addUserButton = new Button("Add User");
-        addUserButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button addUserButton = Utils.createStyledButton("Add User");
 
         addUserButton.setOnAction(e -> {
             String role = userRoleComboBox.getValue();
@@ -414,11 +400,11 @@ public class AdminView extends Application {
 
             if (role == null || userId.isEmpty() || firstName.isEmpty() || lastName.isEmpty() ||
                     username.isEmpty() || password.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a user.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please fill in all fields to add a user.");
                 return;
             }
 
-            addUser(role, userId, firstName, lastName, username, password);
+            DatabaseOperations.addUser(role, userId, firstName, lastName, username, password);
             userRoleComboBox.setValue(null);
             userIdField.clear();
             firstNameField.clear();
@@ -453,8 +439,7 @@ public class AdminView extends Application {
         editUserPane.setAlignment(Pos.CENTER);
         editUserPane.setPadding(new Insets(10));
 
-        Label editUserTitle = new Label("Edit Users");
-        editUserTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label editUserTitle = Utils.createStyledLabel("Edit Users");
 
         TextField editUserIdField = new TextField();
         editUserIdField.setPromptText("Enter User ID");
@@ -472,8 +457,7 @@ public class AdminView extends Application {
         editUserRoleComboBox.getItems().addAll("Buyer", "Seller", "Admin", "BuyerSeller");
         editUserRoleComboBox.setPromptText("Select New Role");
 
-        Button editUserButton = new Button("Edit User");
-        editUserButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button editUserButton = Utils.createStyledButton("Edit User");
 
         editUserButton.setOnAction(e -> {
             String userId = editUserIdField.getText().trim();
@@ -484,7 +468,7 @@ public class AdminView extends Application {
 
             if (userId.isEmpty() || (newUsername.isEmpty() && newFirstName.isEmpty() &&
                     newLastName.isEmpty() && newRole == null)) {
-                showAlert(Alert.AlertType.WARNING, "Please enter User ID and at least one field to update.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter User ID and at least one field to update.");
                 return;
             }
 
@@ -514,23 +498,21 @@ public class AdminView extends Application {
         removeUserPane.setAlignment(Pos.CENTER);
         removeUserPane.setPadding(new Insets(10));
 
-        Label removeUserTitle = new Label("Remove Users");
-        removeUserTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label removeUserTitle = Utils.createStyledLabel("Remove Users");
 
         TextField removeUserIdField = new TextField();
         removeUserIdField.setPromptText("Enter User ID");
 
-        Button removeUserButton = new Button("Remove User");
-        removeUserButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button removeUserButton = Utils.createStyledButton("Remove User");
 
         removeUserButton.setOnAction(e -> {
             String userId = removeUserIdField.getText().trim();
             if (userId.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Please enter User ID to remove.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please enter User ID to remove.");
                 return;
             }
 
-            removeUser(userId);
+            DatabaseOperations.removeUser(userId);
             removeUserIdField.clear();
         });
 
@@ -548,8 +530,7 @@ public class AdminView extends Application {
         roleChangePane.setAlignment(Pos.CENTER);
         roleChangePane.setPadding(new Insets(10));
 
-        Label roleChangeTitle = new Label("Role Change Requests");
-        roleChangeTitle.setStyle("-fx-font-weight: bold; -fx-text-fill: gold;");
+        Label roleChangeTitle = Utils.createStyledLabel("Role Change Requests");
 
         ListView<String> requestsListView = new ListView<>();
         fetchRoleChangeRequests(requestsListView);
@@ -562,7 +543,7 @@ public class AdminView extends Application {
         approveButton.setOnAction(e -> {
             String selectedRequest = requestsListView.getSelectionModel().getSelectedItem();
             if (selectedRequest == null) {
-                showAlert(Alert.AlertType.WARNING, "Please select a request to approve.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please select a request to approve.");
                 return;
             }
             int requestId = Integer.parseInt(selectedRequest.split(" - ")[0]);
@@ -573,7 +554,7 @@ public class AdminView extends Application {
         rejectButton.setOnAction(e -> {
             String selectedRequest = requestsListView.getSelectionModel().getSelectedItem();
             if (selectedRequest == null) {
-                showAlert(Alert.AlertType.WARNING, "Please select a request to reject.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Please select a request to reject.");
                 return;
             }
             int requestId = Integer.parseInt(selectedRequest.split(" - ")[0]);
@@ -610,7 +591,7 @@ public class AdminView extends Application {
                 requestsListView.getItems().add(request);
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error fetching role change requests: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error fetching role change requests: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -648,10 +629,10 @@ public class AdminView extends Application {
             }
 
             conn.commit();
-            showAlert(Alert.AlertType.INFORMATION, "Request " + decision.toLowerCase() + " successfully!");
+            Utils.showAlert(Alert.AlertType.INFORMATION, "Request " + decision.toLowerCase() + " successfully!");
 
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error processing request: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error processing request: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -695,8 +676,7 @@ public class AdminView extends Application {
         reportCategoryComboBox.getItems().addAll("Books and Sales", "Users", "Transactions", "Inventory", "Revenue");
         reportCategoryComboBox.setPromptText("Select Category");
 
-        Button generateReportButton = new Button("Generate Report");
-        generateReportButton.setStyle("-fx-background-color: #800020; -fx-text-fill: white;");
+        Button generateReportButton = Utils.createStyledButton("Generate Report");
         generateReportButton.setOnAction(e -> generateReport(reportCategoryComboBox.getValue()));
 
         VBox reportsBox = new VBox(15, transactionsLabel, transactionBookIdsBox, reportCategoryLabel, reportCategoryComboBox, generateReportButton);
@@ -706,30 +686,6 @@ public class AdminView extends Application {
         return reportsBox;
     }
 
-    private void initializeDatabase() {
-        // Database initialization is assumed to be handled separately.
-    }
-
-    private void addUser(String role, String userId, String firstName, String lastName, String username, String password) {
-        String query = "INSERT INTO users (user_id, first_name, last_name, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement statement = conn.prepareStatement(query)) {
-
-            statement.setString(1, userId);
-            statement.setString(2, firstName);
-            statement.setString(3, lastName);
-            statement.setString(4, username);
-            statement.setString(5, password);
-            statement.setString(6, role);
-            statement.executeUpdate();
-
-            showAlert(Alert.AlertType.INFORMATION, "User added successfully!");
-        } catch (SQLIntegrityConstraintViolationException e) {
-            showAlert(Alert.AlertType.ERROR, "User ID or Username already exists.");
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error adding user: " + e.getMessage());
-        }
-    }
 
     private void editUser(String userId, String newUsername, String newFirstName, String newLastName, String newRole) {
         StringBuilder queryBuilder = new StringBuilder("UPDATE users SET ");
@@ -782,30 +738,12 @@ public class AdminView extends Application {
             int rowsUpdated = statement.executeUpdate();
 
             if (rowsUpdated > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "User updated successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "User updated successfully!");
             } else {
-                showAlert(Alert.AlertType.WARNING, "User ID not found.");
+                Utils.showAlert(Alert.AlertType.WARNING, "User ID not found.");
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error editing user: " + e.getMessage());
-        }
-    }
-
-    private void removeUser(String userId) {
-        String query = "DELETE FROM users WHERE user_id = ?";
-        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
-             PreparedStatement statement = conn.prepareStatement(query)) {
-
-            statement.setString(1, userId);
-            int rowsDeleted = statement.executeUpdate();
-
-            if (rowsDeleted > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "User removed successfully!");
-            } else {
-                showAlert(Alert.AlertType.WARNING, "User ID not found.");
-            }
-        } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error removing user: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error editing user: " + e.getMessage());
         }
     }
 
@@ -823,9 +761,9 @@ public class AdminView extends Application {
             statement.setString(6, condition);
             statement.executeUpdate();
 
-            showAlert(Alert.AlertType.INFORMATION, "Book added successfully!");
+            Utils.showAlert(Alert.AlertType.INFORMATION, "Book added successfully!");
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error adding book: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error adding book: " + e.getMessage());
         }
     }
 
@@ -896,12 +834,12 @@ public class AdminView extends Application {
             int rowsUpdated = statement.executeUpdate();
 
             if (rowsUpdated > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "Book updated successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "Book updated successfully!");
             } else {
-                showAlert(Alert.AlertType.WARNING, "Book ID not found.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Book ID not found.");
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error editing book: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error editing book: " + e.getMessage());
         }
     }
 
@@ -914,18 +852,18 @@ public class AdminView extends Application {
             int rowsDeleted = statement.executeUpdate();
 
             if (rowsDeleted > 0) {
-                showAlert(Alert.AlertType.INFORMATION, "Book removed successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "Book removed successfully!");
             } else {
-                showAlert(Alert.AlertType.WARNING, "Book ID not found.");
+                Utils.showAlert(Alert.AlertType.WARNING, "Book ID not found.");
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error removing book: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error removing book: " + e.getMessage());
         }
     }
 
     private void generateReport(String category) {
         if (category == null) {
-            showAlert(Alert.AlertType.WARNING, "Please select a report category.");
+            Utils.showAlert(Alert.AlertType.WARNING, "Please select a report category.");
             return;
         }
 
@@ -940,9 +878,9 @@ public class AdminView extends Application {
         if (file != null) {
             try {
                 generateExcelReport(file, category);
-                showAlert(Alert.AlertType.INFORMATION, "Report for " + category + " generated successfully!");
+                Utils.showAlert(Alert.AlertType.INFORMATION, "Report for " + category + " generated successfully!");
             } catch (IOException | SQLException e) {
-                showAlert(Alert.AlertType.ERROR, "Error generating report: " + e.getMessage());
+                Utils.showAlert(Alert.AlertType.ERROR, "Error generating report: " + e.getMessage());
             }
         }
     }
@@ -1159,7 +1097,7 @@ public class AdminView extends Application {
                 transactionsList.getItems().add(transaction);
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error fetching transactions: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error fetching transactions: " + e.getMessage());
         }
     }
 
@@ -1176,16 +1114,10 @@ public class AdminView extends Application {
                 bookIdsList.getItems().add("Book ID: " + bookId);
             }
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Error fetching book IDs: " + e.getMessage());
+            Utils.showAlert(Alert.AlertType.ERROR, "Error fetching book IDs: " + e.getMessage());
         }
     }
 
-    private void showAlert(Alert.AlertType type, String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(type, message, ButtonType.OK);
-            alert.showAndWait();
-        });
-    }
 
     public static void main(String[] args) {
         AdminView adminView = new AdminView("AdminFirstName", "AdminLastName", "adminUsername", "ADMIN123");
