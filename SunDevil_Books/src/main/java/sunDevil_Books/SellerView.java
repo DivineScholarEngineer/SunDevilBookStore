@@ -89,8 +89,20 @@ public class SellerView { // **Removed 'extends Application'**
         buttonSection.setAlignment(Pos.CENTER);
 
         // Main Layout
-        HBox mainLayout = new HBox(20, bookInfoSection, sellingInfoSection, buttonSection);
-        mainLayout.setPadding(new Insets(10));
+//        VBox mainLayout = new VBox(20, bookInfoSection, sellingInfoSection, buttonSection);
+//        mainLayout.setPadding(new Insets(10));
+        
+     // Wrapping Book Info and Seller Info in a VBox
+        VBox centerLayout = new VBox(15, bookInfoSection, sellingInfoSection);
+        centerLayout.setAlignment(Pos.CENTER); // Center-align Book and Seller sections
+        centerLayout.setPadding(new Insets(10));
+
+        // Using BorderPane for layout
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setCenter(centerLayout); // Place Book and Seller sections in the center
+        mainLayout.setRight(buttonSection); // Place buttons on the right
+        BorderPane.setMargin(buttonSection, new Insets(0, 10, 0, 10)); // Optional: Add padding for buttons
+
 
         // Top Bar with Hamburger Menu
         Button hamburgerMenu = Utils.createStyledButton("☰");
