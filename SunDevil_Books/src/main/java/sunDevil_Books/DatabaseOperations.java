@@ -137,6 +137,30 @@ public class DatabaseOperations {
         }
         return null; // Return null if no last name found or error occurred
     }
+    
+    public static void addUser(String role, String userId, String firstName, String lastName, String username, String password) {
+        String query = "INSERT INTO users (user_id, first_name, last_name, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD);
+             PreparedStatement statement = conn.prepareStatement(query)) {
+
+            statement.setString(1, userId);
+            statement.setString(2, username);
+            statement.setString(3, role);
+            statement.setString(4, password);
+            statement.setString(2, firstName);
+            statement.setString(3, lastName);
+            statement.setString(4, username);
+            statement.setString(5, password);
+            statement.setString(6, role);
+            statement.executeUpdate();
+
+            Utils.showAlert(Alert.AlertType.INFORMATION, "User added successfully!");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            Utils.showAlert(Alert.AlertType.ERROR, "User ID or Username already exists.");
+        } catch (SQLException e) {
+            Utils.showAlert(Alert.AlertType.ERROR, "Error adding user: " + e.getMessage());
+        }
+    }
 
     // Authenticate user by checking the database for matching credentials
     public static boolean authenticateUser(String userId, String password) {
