@@ -41,7 +41,7 @@ public class BuyerView extends Application {
         logoView.setFitHeight(100); 
         logoView.setPreserveRatio(true); 
 
-        // User Info
+        // User Info,  this Logs the user out and navigates back to the splash screen.
         Button logoutButton = Utils.createStyledButton("Log Out");
         logoutButton.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Logged out successfully!", ButtonType.OK);
@@ -116,7 +116,8 @@ public class BuyerView extends Application {
         conditionSection.getChildren().addAll(conditionLabel, conditionFilters);
 
         filterBoxes.getChildren().addAll(categorySection, conditionSection);
-        
+
+        //Triggers filter application to update the book list based on selected categories and conditions
         Button applyFiltersButton = Utils.createStyledButton("Apply Filters");
 
         HBox applyFilterButtonBox = new HBox(applyFiltersButton);
