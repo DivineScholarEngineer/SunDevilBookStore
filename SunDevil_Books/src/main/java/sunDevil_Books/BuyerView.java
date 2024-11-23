@@ -249,7 +249,13 @@ public class BuyerView extends Application {
         StringBuilder orderDetails = new StringBuilder();
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.DB_USER, DatabaseConfig.DB_PASSWORD)) {
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Start transaction
+
+            // Validate that the user is a buyer
+            if (!isBuyer(conn, this.userId)) {
+                showAlert(Alert.AlertType.ERROR, "Permission Denied", "You must be a buyer to place an order.");
+                return;
+            }
 
             for (javafx.scene.Node node : selectedBooksBox.getChildren()) {
                 if (node instanceof HBox) {
@@ -268,14 +274,22 @@ public class BuyerView extends Application {
 
                             int bookId = Integer.parseInt(parts[0].trim());
                             double price = Double.parseDouble(parts[5].trim().replace("$", ""));
-                            String sellerId = "DIVOLO2311";
+                            String sellerId = getSellerId(conn, bookId);
 
-                            String insertTransaction = "INSERT INTO transactions (book_id, sale_price, buyer_id, seller_id, transaction_date) VALUES (?, ?, ?, ?, ?)";
+                            if (sellerId == null) {
+                                showAlert(Alert.AlertType.ERROR, "Seller Not Found", "The seller for the selected book is invalid.");
+                                conn.rollback();
+                                return;
+                            }
+
+                            // Insert transaction
+                            String insertTransaction = "INSERT INTO transactions (book_id, sale_price, buyer_id, seller_id, transaction_date) " +
+                                                        "VALUES (?, ?, ?, ?, ?)";
                             try (PreparedStatement pstmt = conn.prepareStatement(insertTransaction)) {
                                 pstmt.setInt(1, bookId);
                                 pstmt.setDouble(2, price);
-                                pstmt.setString(3, this.userId);
-                                pstmt.setString(4, sellerId);
+                                pstmt.setString(3, this.userId); // Current user placing the order
+                                pstmt.setString(4, sellerId);   // Seller of the book
                                 pstmt.setDate(5, Date.valueOf(LocalDate.now()));
                                 pstmt.executeUpdate();
                             }
@@ -287,18 +301,78 @@ public class BuyerView extends Application {
             }
 
             if (!anySelected) {
-                showAlert(Alert.AlertType.WARNING, "No Selection", "Please select at least one book to create an order.");
+                showAlert(Alert.AlertType.WARNING, "No Selection", "Please select at least one book to place an order.");
                 return;
             }
 
-            conn.commit();
-            showAlert(Alert.AlertType.INFORMATION, "Order Created", "Your order has been successfully created:\n" + orderDetails.toString());
+            conn.commit(); // Commit transaction
+            showAlert(Alert.AlertType.INFORMATION, "Order Created", "Your order has been successfully placed:\n" + orderDetails.toString());
 
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Error creating order: " + e.getMessage());
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Error creating order: " + e.getMessage());
         }
     }
+
+    /**
+     * Validates if the current user is a buyer.
+     */
+    private boolean isBuyer(Connection conn, String userId) throws SQLException {
+        String query = "SELECT role FROM users WHERE user_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return "Buyer".equalsIgnoreCase(rs.getString("role"));
+                }
+            }
+        }
+        return false; // User is not a buyer
+    }
+
+    /**
+     * Retrieves the seller ID for a given book ID.
+     */
+    private String getSellerId(Connection conn, int bookId) throws SQLException {
+        String query = "SELECT seller_id FROM books WHERE book_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, bookId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("seller_id");
+                }
+            }
+        }
+        return null; // Seller not found
+    }
+
+
+    /**
+     * Validates if a book exists in the books table.
+     */
+    private boolean isValidBook(Connection conn, int bookId) throws SQLException {
+        String query = "SELECT COUNT(*) FROM books WHERE book_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, bookId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    /**
+     * Validates if a user exists in the users table.
+     */
+    private boolean isValidUser(Connection conn, String userId) throws SQLException {
+        String query = "SELECT COUNT(*) FROM users WHERE user_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
 
     private void addBookToList(String bookInfo) {
         CheckBox bookCheckBox = new CheckBox(bookInfo);
