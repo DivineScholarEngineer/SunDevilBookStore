@@ -34,8 +34,6 @@ CREATE TABLE users (
     role ENUM('Admin', 'Buyer', 'Seller') DEFAULT 'Buyer' NOT NULL, -- Role of the user, default to 'Buyer'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Created at timestamp
 );
-DROP TABLE IF EXISTS users; 
-SET FOREIGN_KEY_CHECKS = 0;
 
 -- Create books table
 DROP TABLE IF EXISTS books;
@@ -84,7 +82,7 @@ SELECT * FROM books;
 SELECT * FROM users;
 SELECT * FROM transactions;
 
--- ALTER USER 'root'@'localhost' IDENTIFIED BY 'Sql-Protect_21-2023-EF24';
+-- ALTER USER 'root'@'localhost' IDENTIFIED BY 'Sql-Protect_24-2-2023-EF25';
 -- SET PASSWORD FOR 'root'@'localhost' = 'Sql-Protect_24-2023-EF24';
 
 -- ALTER DATABASE sunDevilBooks SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
