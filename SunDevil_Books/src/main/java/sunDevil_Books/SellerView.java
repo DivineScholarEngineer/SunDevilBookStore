@@ -88,10 +88,7 @@ public class SellerView { // **Removed 'extends Application'**
         VBox buttonSection = new VBox(10, calculateSellingPriceButton, sellingPriceField, listMyBookButton);
         buttonSection.setAlignment(Pos.CENTER);
 
-        // Main Layout
-//        VBox mainLayout = new VBox(20, bookInfoSection, sellingInfoSection, buttonSection);
-//        mainLayout.setPadding(new Insets(10));
-        
+        // Main Layout        
      // Wrapping Book Info and Seller Info in a VBox
         VBox centerLayout = new VBox(15, bookInfoSection, sellingInfoSection);
         centerLayout.setAlignment(Pos.CENTER); // Center-align Book and Seller sections
@@ -244,6 +241,7 @@ public class SellerView { // **Removed 'extends Application'**
         currentStage.close();
 
         // Open BuyerView
+//        BuyerView buyerView = new BuyerView(userId);
         BuyerView buyerView = new BuyerView(userId, username);
         buyerView.start(new Stage());
     }
